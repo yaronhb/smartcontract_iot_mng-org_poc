@@ -1,0 +1,41 @@
+&FreeRADIUS-Client-IP-Prefix := 10.1.2.3/32
+
+subnet
+
+if (&reply.Reply-Message[0] != '10.1/16 subnet') {
+	test_fail
+} else {
+	test_pass
+}
+
+if (&reply.Reply-Message[1] != "2nd 10.1/16 subnet") {
+	test_fail
+} else {
+	test_pass
+}
+
+
+&FreeRADIUS-Client-IP-Prefix := 10.2.3.4/32
+
+&reply -= &Reply-Message[*]
+
+subnet
+
+if (&reply.Reply-Message != "10/8 subnet") {
+	test_fail
+} else {
+	test_pass
+}
+
+&FreeRADIUS-Client-IP-Prefix := 10.1.2.3/32
+&Password.Cleartext := "hello"
+
+&reply -= &Reply-Message[*]
+
+subnet
+
+&FreeRADIUS-Client-IP-Prefix := 192.168.1.1/32
+
+&reply -= &Reply-Message[*]
+
+subnet

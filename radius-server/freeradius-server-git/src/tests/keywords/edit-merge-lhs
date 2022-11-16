@@ -1,0 +1,33 @@
+#
+# PRE: edit-merge
+#
+#  A MERGE B, priority B
+#
+#	= A if there's no B
+#	= B if A exists
+#	= A' MERGE B' if A and B are lists
+#
+
+&Tmp-String-0 := "foo"
+&control.Tmp-String-0 := "bar"
+
+# merge
+&request <= &control
+
+if (!&Tmp-String-0) {
+	test_fail
+}
+
+# we want the *control* version
+if (!(&Tmp-String-0 == "bar")) {
+	%(debug_attr:request[*])
+	test_fail
+}
+
+#  and the original value should not be there
+if (&Tmp-String-0 == "foo") {
+	%(debug_attr:request[*])
+	test_fail
+}
+
+success

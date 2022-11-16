@@ -1,0 +1,33 @@
+#
+# PRE: edit-list
+#
+#  A MERGE B
+#
+#	= B if there's no A
+#	= A if B exists
+#	= A' MERGE B' if A and B are lists
+#
+
+&Tmp-String-0 := "foo"
+&control.Tmp-String-0 := "bar"
+
+# merge
+&request >= &control
+
+if (!&Tmp-String-0) {
+	test_fail
+}
+
+# The original value should be unchanged
+if (!(&Tmp-String-0 == "foo")) {
+	%(debug_attr:request[*])
+	test_fail
+}
+
+#  and the new value should not be there
+if (&Tmp-String-0 == "bar") {
+	%(debug_attr:request[*])
+	test_fail
+}
+
+success

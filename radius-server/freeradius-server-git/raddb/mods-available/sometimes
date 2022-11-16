@@ -1,0 +1,36 @@
+#  -*- text -*-
+#
+#
+#  $Id$
+
+#######################################################################
+#
+#  = Sometimes Module
+#
+#  The `sometimes` module is used for `debugging` purposes. Each instance
+#  randomly returns the configured result, or `noop`.
+#
+#  NOTE: It is based on the `always` module.
+#
+
+#
+#  ## Configuration Settings
+#
+sometimes {
+	#
+	#  key:: The `key` used for index.
+	#
+	key = &User-Name
+
+	#
+	#  rcode:: Return code.
+	#
+	rcode = fail
+
+	#
+	#  percentage:: The percentage of times that the module will fail
+	#
+	#  Must be a number between 0 and 100.
+	#
+	percentage = 1
+}

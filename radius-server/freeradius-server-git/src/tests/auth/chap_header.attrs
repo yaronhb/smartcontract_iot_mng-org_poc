@@ -1,0 +1,5 @@
+Packet-Type = Access-Request
+User-Name = "bob"
+CHAP-Password = 'oracle01'
+
+Packet-Type == Access-Accept

@@ -1,0 +1,17 @@
+#
+#  Run the "ldap" module
+#  PRE: auth
+#
+ldap.accounting {
+}
+if (!ok) {
+        test_fail
+}
+
+&Tmp-String-0 := "%{ldap:ldap://$ENV{TEST_SERVER}/uid=john,ou=people,dc=example,dc=com?description}"
+
+if (&Tmp-String-0 != "User john is online") {
+        test_fail
+}
+
+test_pass

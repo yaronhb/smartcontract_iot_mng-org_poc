@@ -1,0 +1,20 @@
+1. COPYRIGHT
+
+1.1 doc/rfc/
+
+Most of the files in this directory are copyrighted by the Internet
+Society, Inc.  See the contents of the files for details.
+
+1.2. All other files
+
+Copyright for other files is held by individual contributors.  See the
+contents of the files for details
+
+2. LICENSE
+
+The license for all source code is the GNU GPL version 2, which is
+included with this program in the LICENSE file in this directory.
+
+The license for the documentation the Creative Commons
+Attribution-NonCommercial 4.0 International (CC-by-NC 4.0).  It is
+found in the file doc/LICENSE.

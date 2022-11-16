@@ -1,0 +1,7 @@
+# PRE: if
+#
+#  return code in an "if" section.
+#
+if (&User-Name == "bob") {
+	ok = reject	# ERROR
+}

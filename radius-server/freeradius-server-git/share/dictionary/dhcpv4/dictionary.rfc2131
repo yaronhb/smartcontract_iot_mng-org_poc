@@ -1,0 +1,299 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#	DHCP dictionary.
+#
+#	http://www.iana.org/assignments/bootp-parameters
+#
+#	Also http://www.networksorcery.com/enp/protocol/bootp/options.htm
+#
+#	http://www.bind9.net/rfc-dhcp
+#
+#	$Id$
+#
+##############################################################################
+
+##############################################################################
+#
+#	DHCP Options, with comments.  For now, many are "octets",
+#	as FreeRADIUS doesn't handle complex data structures.
+#
+##############################################################################
+
+#ATTRIBUTE	Pad				0	octets
+ATTRIBUTE	Subnet-Mask				1	ipaddr
+# Time Offset in twos-complement notation.
+ATTRIBUTE	Time-Offset				2	uint32
+ATTRIBUTE	Router-Address				3	ipaddr array
+ATTRIBUTE	Time-Server				4	ipaddr array
+ATTRIBUTE	IEN-116-Name-Server			5	ipaddr array
+ATTRIBUTE	Domain-Name-Server			6	ipaddr array
+# Logging-Server addresses
+ATTRIBUTE	Log-Server				7	ipaddr array
+ATTRIBUTE	Quotes-Server				8	ipaddr array
+ATTRIBUTE	LPR-Server				9	ipaddr array
+ATTRIBUTE	Impress-Server				10	ipaddr array
+ATTRIBUTE	RLP-Server				11	ipaddr array
+# Hostname string
+ATTRIBUTE	Hostname				12	string
+# Size of boot file in 512 uint8
+ATTRIBUTE	Boot-File-Size				13	uint16
+# Client to dump and name
+ATTRIBUTE	Merit-Dump-File				14	string
+ATTRIBUTE	Domain-Name				15	string
+ATTRIBUTE	Swap-Server				16	ipaddr
+# Path name for root disk
+ATTRIBUTE	Root-Path				17	string
+ATTRIBUTE	Bootp-Extensions-Path			18	string
+ATTRIBUTE	IP-Forward-Enable			19	bool
+ATTRIBUTE	Source-Route-Enable			20	bool
+# Routing Policy Filters
+ATTRIBUTE	Policy-Filter				21	ipv4prefix	prefix=split,array
+ATTRIBUTE	Max-Datagram-Reassembly-Size		22	uint16
+ATTRIBUTE	Default-IP-TTL				23	byte
+ATTRIBUTE	Path-MTU-Aging-Timeout			24	uint32
+ATTRIBUTE	Path-MTU-Plateau-Table			25	uint16 array
+ATTRIBUTE	Interface-MTU-Size			26	uint16
+ATTRIBUTE	All-Subnets-Are-Local			27	bool
+ATTRIBUTE	Broadcast-Address			28	ipaddr
+ATTRIBUTE	Perform-Mask-Discovery			29	bool
+ATTRIBUTE	Provide-Mask-To-Others			30	bool
+ATTRIBUTE	Perform-Router-Discovery		31	bool
+ATTRIBUTE	Router-Solicitation-Address		32	ipaddr
+# first is destination address, second is router.
+ATTRIBUTE	Static-Routes				33	ipaddr array
+ATTRIBUTE	Trailer-Encapsulation			34	bool
+ATTRIBUTE	ARP-Cache-Timeout			35	uint32
+ATTRIBUTE	Ethernet-Encapsulation			36	bool
+ATTRIBUTE	Default-TCP-TTL				37	uint8
+ATTRIBUTE	Keep-Alive-Interval			38	uint32
+ATTRIBUTE	Keep-Alive-Garbage			39	bool
+ATTRIBUTE	NIS-Domain-Name				40	string
+ATTRIBUTE	NIS-Servers				41	ipaddr array
+ATTRIBUTE	NTP-Servers				42	ipaddr array
+# N Vendor Specific Information
+ATTRIBUTE	Vendor					43	octets # tlv
+ATTRIBUTE	NETBIOS-Name-Servers			44	ipaddr array
+ATTRIBUTE	NETBIOS-Dgm-Dist-Servers		45	ipaddr array
+ATTRIBUTE	NETBIOS-Node-Type			46	uint8
+# N NETBIOS Scope
+ATTRIBUTE	NETBIOS					47	octets
+ATTRIBUTE	X-Window-Font-Server			48	ipaddr array
+ATTRIBUTE	X-Window-Display-Mgr			49	ipaddr array
+ATTRIBUTE	Requested-IP-Address			50	ipaddr
+ATTRIBUTE	IP-Address-Lease-Time			51	uint32
+# Overload "sname" or "file"
+ATTRIBUTE	Overload				52	uint8
+ATTRIBUTE	Message-Type				53	uint8
+
+VALUE	Message-Type			Discover		1
+VALUE	Message-Type			Offer			2
+VALUE	Message-Type			Request			3
+VALUE	Message-Type			Decline			4
+VALUE	Message-Type			Ack			5
+VALUE	Message-Type			NAK			6
+VALUE	Message-Type			Release			7
+VALUE	Message-Type			Inform			8
+VALUE	Message-Type			Force-Renew		9
+VALUE	Message-Type			Lease-Query		10
+VALUE	Message-Type			Lease-Unassigned	11
+VALUE	Message-Type			Lease-Unknown		12
+VALUE	Message-Type			Lease-Active		13
+VALUE	Message-Type			Bulk-Lease-Query	14
+VALUE	Message-Type			Lease-Query-Done	15
+
+ATTRIBUTE	Server-Identifier			54	ipaddr
+
+# Array of 1-uint8 numbers indicating which options the client
+# would like to see in the response.
+ATTRIBUTE	Parameter-Request-List			55	uint8 array
+ATTRIBUTE	Error-Message				56	string
+ATTRIBUTE	Maximum-Msg-Size			57	uint16
+ATTRIBUTE	Renewal-Time				58	uint32
+ATTRIBUTE	Rebinding-Time				59	uint32
+ATTRIBUTE	Vendor-Class-Identifier			60	octets
+
+# Client Identifier
+# First octet MAY be Hardware-Type, rest are type-specific data,
+# e.g. MAC address. It's up to the administrator to make sense of
+# the value. We can't do anything more in the parser.
+ATTRIBUTE	Client-Identifier			61	octets
+ATTRIBUTE	NIS-Client-Domain-Name			64	octets
+ATTRIBUTE	NIS-Server-Address			65	ipaddr
+ATTRIBUTE	TFTP-Server-Name			66	string
+ATTRIBUTE	Boot-File-Name				67	string
+# Home Agent Addresses
+ATTRIBUTE	Home-Agent-Address			68	ipaddr array
+ATTRIBUTE	SMTP-Server-Address			69	ipaddr array
+ATTRIBUTE	POP3-Server-Address			70	ipaddr array
+ATTRIBUTE	NNTP-Server-Address			71	ipaddr array
+ATTRIBUTE	WWW-Server-Address			72	ipaddr array
+ATTRIBUTE	Finger-Server-Address			73	ipaddr array
+ATTRIBUTE	IRC-Server-Address			74	ipaddr array
+ATTRIBUTE	StreetTalk-Server-Address		75	ipaddr array
+ATTRIBUTE	STDA-Server-Address			76	ipaddr array
+
+#ATTRIBUTE	Etherboot				128	ether
+# (for IP Phone software load)
+
+# 144 - 149 unused
+
+# RFC 3942 - 159-174 - Unassigned
+# RFC 3942 - 178-207 - Unassigned
+# RFC 3942 - 214-219 - Unassigned
+
+# RFC 3942 - 224-253 - Site Specific
+ATTRIBUTE	Site-specific-0				224	octets
+ATTRIBUTE	Site-specific-1				225	octets
+ATTRIBUTE	Site-specific-2				226	octets
+ATTRIBUTE	Site-specific-3				227	octets
+ATTRIBUTE	Site-specific-4				228	octets
+ATTRIBUTE	Site-specific-5				229	octets
+ATTRIBUTE	Site-specific-6				230	octets
+ATTRIBUTE	Site-specific-7				231	octets
+ATTRIBUTE	Site-specific-8				232	octets
+ATTRIBUTE	Site-specific-9				233	octets
+ATTRIBUTE	Site-specific-10			234	octets
+ATTRIBUTE	Site-specific-11			235	octets
+ATTRIBUTE	Site-specific-12			236	octets
+ATTRIBUTE	Site-specific-13			237	octets
+ATTRIBUTE	Site-specific-14			238	octets
+ATTRIBUTE	Site-specific-15			239	octets
+ATTRIBUTE	Site-specific-16			240	octets
+ATTRIBUTE	Site-specific-17			241	octets
+ATTRIBUTE	Site-specific-18			242	octets
+ATTRIBUTE	Site-specific-19			243	octets
+ATTRIBUTE	Site-specific-20			244	octets
+ATTRIBUTE	Site-specific-21			245	octets
+ATTRIBUTE	Site-specific-22			246	octets
+ATTRIBUTE	Site-specific-23			247	octets
+ATTRIBUTE	Site-specific-24			248	octets
+ATTRIBUTE	Site-specific-25			249	octets
+ATTRIBUTE	Site-specific-26			250	octets
+ATTRIBUTE	Site-specific-27			251	octets
+ATTRIBUTE	Site-specific-28			252	octets
+ATTRIBUTE	Site-specific-29			253	octets
+ATTRIBUTE	Site-specific-30			253	octets
+
+ATTRIBUTE	End-Of-Options				255	uint8
+
+VALUE	Parameter-Request-List		Subnet-Mask		1
+VALUE	Parameter-Request-List		Time-Offset		2
+VALUE	Parameter-Request-List		Router-Address		3
+VALUE	Parameter-Request-List		Time-Server		4
+VALUE	Parameter-Request-List		IEN-116-Name-Server	5
+VALUE	Parameter-Request-List		Domain-Name-Server	6
+VALUE	Parameter-Request-List		Log-Server		7
+VALUE	Parameter-Request-List		Quotes-Server		8
+VALUE	Parameter-Request-List		LPR-Server		9
+VALUE	Parameter-Request-List		Impress-Server		10
+VALUE	Parameter-Request-List		RLP-Server		11
+VALUE	Parameter-Request-List		Hostname		12
+VALUE	Parameter-Request-List		Boot-File-Size		13
+VALUE	Parameter-Request-List		Merit-Dump-File		14
+VALUE	Parameter-Request-List		Domain-Name		15
+VALUE	Parameter-Request-List		Swap-Server		16
+VALUE	Parameter-Request-List		Root-Path		17
+VALUE	Parameter-Request-List		Bootp-Extensions-Path	18
+VALUE	Parameter-Request-List		IP-Forward-Enable	19
+VALUE	Parameter-Request-List		Source-Route-Enable	20
+VALUE	Parameter-Request-List		Policy-Filter		21
+VALUE	Parameter-Request-List		Max-Datagram-Reassembly-Sz 22
+VALUE	Parameter-Request-List		Default-IP-TTL		23
+VALUE	Parameter-Request-List		Path-MTU-Aging-Timeout	24
+VALUE	Parameter-Request-List		Path-MTU-Plateau-Table	25
+VALUE	Parameter-Request-List		Interface-MTU-Size	26
+VALUE	Parameter-Request-List		All-Subnets-Are-Local	27
+VALUE	Parameter-Request-List		Broadcast-Address	28
+VALUE	Parameter-Request-List		Perform-Mask-Discovery	29
+VALUE	Parameter-Request-List		Provide-Mask-To-Others	30
+VALUE	Parameter-Request-List		Perform-Router-Discovery 31
+VALUE	Parameter-Request-List		Router-Solicitation-Address 32
+VALUE	Parameter-Request-List		Static-Routes		33
+VALUE	Parameter-Request-List		Trailer-Encapsulation	34
+VALUE	Parameter-Request-List		ARP-Cache-Timeout	35
+VALUE	Parameter-Request-List		Ethernet-Encapsulation	36
+VALUE	Parameter-Request-List		Default-TCP-TTL		37
+VALUE	Parameter-Request-List		Keep-Alive-Interval	38
+VALUE	Parameter-Request-List		Keep-Alive-Garbage	39
+VALUE	Parameter-Request-List		NIS-Domain-Name		40
+VALUE	Parameter-Request-List		NIS-Servers		41
+VALUE	Parameter-Request-List		NTP-Servers		42
+VALUE	Parameter-Request-List		Vendor			43
+VALUE	Parameter-Request-List		NETBIOS-Name-Servers	44
+VALUE	Parameter-Request-List		NETBIOS-Dgm-Dist-Servers 45
+VALUE	Parameter-Request-List		NETBIOS-Node-Type	46
+VALUE	Parameter-Request-List		NETBIOS			47
+VALUE	Parameter-Request-List		X-Window-Font-Server	48
+VALUE	Parameter-Request-List		X-Window-Display-Mgr	49
+VALUE	Parameter-Request-List		Requested-IP-Address	50
+VALUE	Parameter-Request-List		IP-Address-Lease-Time	51
+VALUE	Parameter-Request-List		Overload		52
+VALUE	Parameter-Request-List		Message-Type		53
+VALUE	Parameter-Request-List		Server-Identifier	54
+VALUE	Parameter-Request-List		Parameter-Request-List	55
+VALUE	Parameter-Request-List		Error-Message		56
+VALUE	Parameter-Request-List		Maximum-Msg-Size	57
+VALUE	Parameter-Request-List		Renewal-Time		58
+VALUE	Parameter-Request-List		Rebinding-Time		59
+VALUE	Parameter-Request-List		Class-Identifier	60
+VALUE	Parameter-Request-List		Client-Identifier	61
+VALUE	Parameter-Request-List		Netware-Domain-Name	62
+VALUE	Parameter-Request-List		Netware-Sub-Options	63
+VALUE	Parameter-Request-List		NIS-Client-Domain-Name	64
+VALUE	Parameter-Request-List		NIS-Server-Address	65
+VALUE	Parameter-Request-List		TFTP-Server-Name	66
+VALUE	Parameter-Request-List		Boot-File-Name		67
+VALUE	Parameter-Request-List		Home-Agent-Address	68
+VALUE	Parameter-Request-List		SMTP-Server-Address	69
+VALUE	Parameter-Request-List		POP3-Server-Address	70
+VALUE	Parameter-Request-List		NNTP-Server-Address	71
+VALUE	Parameter-Request-List		WWW-Server-Address	72
+VALUE	Parameter-Request-List		Finger-Server-Address	73
+VALUE	Parameter-Request-List		IRC-Server-Address	74
+VALUE	Parameter-Request-List		StreetTalk-Server-Address 75
+VALUE	Parameter-Request-List		STDA-Server-Address	76
+VALUE	Parameter-Request-List		User-Class		77
+VALUE	Parameter-Request-List		Directory-Agent		78
+VALUE	Parameter-Request-List		Service-Scope		79
+VALUE	Parameter-Request-List		Rapid-Commit		80
+VALUE	Parameter-Request-List		Client-FQDN		81
+VALUE	Parameter-Request-List		Relay-Agent-Information	82
+VALUE	Parameter-Request-List		iSNS			83
+VALUE	Parameter-Request-List		NDS-Servers		85
+VALUE	Parameter-Request-List		NDS-Tree-Name		86
+VALUE	Parameter-Request-List		NDS-Context		87
+VALUE	Parameter-Request-List		Authentication		90
+VALUE	Parameter-Request-List		Client-Last-Transaction-Time 91
+VALUE	Parameter-Request-List		associated-ip		92
+VALUE	Parameter-Request-List		Client-System		93
+VALUE	Parameter-Request-List		Client-NDI		94
+VALUE	Parameter-Request-List		LDAP			95
+VALUE	Parameter-Request-List		UUID/GUID		97
+VALUE	Parameter-Request-List		User-Auth		98
+VALUE	Parameter-Request-List		Netinfo-Address		112
+VALUE	Parameter-Request-List		Netinfo-Tag		113
+VALUE	Parameter-Request-List		URL			114
+VALUE	Parameter-Request-List		Auto-Config		116
+VALUE	Parameter-Request-List		Name-Service-Search	117
+VALUE	Parameter-Request-List		Subnet-Selection-Option	118
+VALUE	Parameter-Request-List		Domain-Search		119
+VALUE	Parameter-Request-List		SIP-Servers-Option	120
+VALUE	Parameter-Request-List		Classless-Static-Route	121
+VALUE	Parameter-Request-List		CCC			122
+VALUE	Parameter-Request-List		GeoConf-Option		123
+VALUE	Parameter-Request-List		V-I-Vendor-Class	124
+VALUE	Parameter-Request-List		V-I-Vendor-Specific	125
+VALUE	Parameter-Request-List		Etherboot		128
+VALUE	Parameter-Request-List		TFTP-Server-IP-Address	128
+VALUE	Parameter-Request-List		Call-Server-IP-address	129
+VALUE	Parameter-Request-List		Ethernet-Interface	130
+VALUE	Parameter-Request-List		Vendor-Discrimination-Str 130
+VALUE	Parameter-Request-List		Remote-Stats-Svr-IP-Address 131
+VALUE	Parameter-Request-List		IEEE-802dot1P-VLAN-ID	132
+VALUE	Parameter-Request-List		IEEE-802dot1Q-L2-Priority 133
+VALUE	Parameter-Request-List		Diffserv-Code-Point	134
+VALUE	Parameter-Request-List		HTTP-Proxy		135

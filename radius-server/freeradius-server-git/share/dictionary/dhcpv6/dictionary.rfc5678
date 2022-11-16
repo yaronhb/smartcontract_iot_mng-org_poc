@@ -1,0 +1,23 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC 5678 - Dynamic Host Configuration Protocol (DHCPv4 and DHCPv6) Options for
+#             IEEE 802.21 Mobility Services (MoS) Discovery
+#
+#  $Id$
+#
+##############################################################################
+
+ATTRIBUTE	MOD-Address-List			54	tlv
+ATTRIBUTE	IS					.1	ipv6addr array
+ATTRIBUTE	CS					.2	ipv6addr array
+ATTRIBUTE	ES					.3	ipv6addr array
+
+ATTRIBUTE	MOS-Domain-Name-List			55	tlv
+ATTRIBUTE	IS					.1	string dns_label,array
+ATTRIBUTE	CS					.2	string dns_label,array
+ATTRIBUTE	ES					.3	string dns_label,array
+

@@ -1,0 +1,214 @@
+# -*- makefile -*-
+# Make.inc.in
+#
+# Version:	$Id$
+#
+
+# Location of files.
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+sysconfdir	= @sysconfdir@
+localstatedir	= @localstatedir@
+libdir		= @libdir@
+bindir		= @bindir@
+sbindir		= @sbindir@
+docdir		= @docdir@
+mandir		= @mandir@
+datadir		= @datadir@
+dictdir		= @dictdir@
+mibdir		= @mibdir@
+logdir		= @logdir@
+includedir	= @includedir@
+
+#
+#  In some systems, we don't want to over-write ANY configuration.
+#  So we do:
+#
+#	$./configure
+#	$ make
+#	$ make -Draddbdir=/tmp/garbage install
+#
+#  and all of the configuration files go into /tmp/garbage
+#
+ifeq "${raddbdir}" ""
+raddbdir	= @raddbdir@
+endif
+modconfdir	= @modconfdir@
+radacctdir	= @radacctdir@
+top_builddir	= @abs_top_builddir@
+top_build_prefix=@abs_top_builddir@/
+top_srcdir	= @abs_top_srcdir@
+datarootdir	= @datarootdir@
+
+MAKE		= @MAKE@
+
+# Makeflags set within the makefile appear to be additive and override
+# flags set on the command line and the environmental variables
+MAKEFLAGS	= @FR_MAKEFLAGS@
+
+BUILD_SYSTEM	= @BUILD_SYSTEM@
+BUILD_CC	= @BUILD_CC@
+BUILD_RANLIB	= @BUILD_RANLIB@
+BUILD_EXE_EXT	= @BUILD_EXE_EXT@
+BUILD_LIB_EXT	= @BUILD_LIB_EXT@
+
+TARGET_SYSTEM	= @TARGET_SYSTEM@
+TARGET_CC       = @TARGET_CC@
+TARGET_RANLIB   = @TARGET_RANLIB@
+TARGET_EXE_EXT	= @TARGET_EXE_EXT@
+TARGET_LIB_EXT	= @TARGET_LIB_EXT@
+
+# Lazy alias seeing as it's used everywhere
+L		= .$(TARGET_LIB_EXT)
+
+ifneq "${TARGET_EXE_EXT}" ""
+E		= .$(TARGET_EXE_EXT)
+else
+E		=
+endif
+
+ifneq (,$(findstring wasm,${TARGET_SYSTEM}))
+TARGET_IS_WASM  = yes
+endif
+
+INCLUDE		= -I. -Isrc \
+		  -include src/freeradius-devel/autoconf.h \
+		  -include src/freeradius-devel/build.h \
+		  -include src/freeradius-devel/features.h \
+		  -include src/freeradius-devel/radpaths.h
+CFLAGS		= $(INCLUDE) -fno-strict-aliasing @CFLAGS@
+CPPFLAGS	= @CPPFLAGS@
+LIBPREFIX	= @LIBPREFIX@
+
+LIBTOOL		= JLIBTOOL
+ACLOCAL		= @ACLOCAL@
+AUTOCONF	= @AUTOCONF@
+AUTOHEADER	= @AUTOHEADER@
+INSTALL		= ${top_builddir}/install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+INSTALL_SCRIPT	= ${INSTALL_PROGRAM}
+INSTALLSTRIP	= @INSTALLSTRIP@
+
+#
+#  Linker arguments for libraries searched for by the main
+#  configure script.
+#
+TALLOC_LIBS     = @TALLOC_LIBS@
+TALLOC_LDFLAGS  = @TALLOC_LDFLAGS@
+
+KQUEUE_LIBS     = @KQUEUE_LIBS@
+KQUEUE_LDFLAGS  = @KQUEUE_LDFLAGS@
+
+OPENSSL_LIBS    = @OPENSSL_LIBS@
+OPENSSL_LDFLAGS = @OPENSSL_LDFLAGS@
+OPENSSL_CPPFLAGS = @OPENSSL_CPPFLAGS@
+
+PCAP_LIBS	= @PCAP_LIBS@
+PCAP_LDFLAGS    = @PCAP_LDFLAGS@
+
+COLLECTDC_LIBS	= @COLLECTDC_LIBS@
+COLLECTDC_LDFLAGS = @COLLECTDC_LDFLAGS@
+
+GPERFTOOLS_LIBS	= @GPERFTOOLS_LIBS@
+GPERFTOOLS_LDFLAGS = @GPERFTOOLS_LDFLAGS@
+
+SYSTEMD_LIBS = @SYSTEMD_LIBS@
+SYSTEMD_LDFLAGS = @SYSTEMD_LDFLAGS@
+
+LCRYPT		= @CRYPTLIB@
+
+#
+#  OpenSSL libs (if used) must be linked everywhere in order for
+#  the server to work properly on on all platforms.
+#
+LIBS		= $(OPENSSL_LIBS) $(TALLOC_LIBS) $(KQUEUE_LIBS) @LIBS@
+LDFLAGS		= $(OPENSSL_LDFLAGS) $(TALLOC_LDFLAGS) $(KQUEUE_LDFLAGS) @LDFLAGS@
+
+LOGDIR		= ${logdir}
+RADDBDIR	= ${raddbdir}
+RUNDIR		= ${localstatedir}/run/radiusd
+SBINDIR		= ${sbindir}
+RADIR		= ${radacctdir}
+
+bm_shared_libs  = yes
+bm_static_libs  = yes
+
+LIBREADLINE		= @LIBREADLINE@
+LIBREADLINE_PREFIX	= @LIBREADLINE_PREFIX@
+ifneq "$(LIBREADLINE_PREFIX)" ""
+LIBREADLINE_CFLAGS	= -I$(LIBREADLINE_PREFIX)/include
+LIBREADLINE_LDFLAGS	= -L$(LIBREADLINE_PREFIX)/lib
+endif
+
+#
+#  Version to use for packaging and other Make related things
+#
+RADIUSD_VERSION_STRING = @RADIUSD_VERSION_STRING@
+
+#
+#  This allows dlopen to do runtime checks for version mismatches
+#  between what it was originally linked with, and the library it's
+#  actually loading.
+#
+MODULES		= @MODULES@
+
+#
+#  If the system has OpenSSL, use it's version of MD4/MD5/SHA1, instead of
+#  using ours.
+#
+#  We don't use OpenSSL SHA1 by default because src/modules/rlm_eap/libeap/fips186prf.c
+#  needs access to the SHA internals.
+#
+ifneq ($(OPENSSL_LIBS),)
+CFLAGS			+=  -DWITH_OPENSSL_MD4 -DWITH_OPENSSL_MD5
+CPPFLAGS		:= $(OPENSSL_CPPFLAGS) $(CPPFLAGS)
+#
+#  Add optional dependency for libfreeradius-server if we're building with OpenSSL
+#
+LIBFREERADIUS_SERVER	:= libfreeradius-internal.a libfreeradius-tls.a
+endif
+LIBFREERADIUS_SERVER	+= libfreeradius-server.a libfreeradius-unlang.a
+
+ifneq ($(WITH_OPENSSL_MD5),)
+WITH_OPENSSL_DIGEST = 1
+CFLAGS += -DWITH_OPENSSL_MD5
+endif
+
+ifneq ($(WITH_OPENSSL_SHA1),)
+WITH_OPENSSL_DIGEST = 1
+CFLAGS += -DWITH_OPENSSL_SHA1
+endif
+
+ifneq ($(WITH_OPENSSL_DIGEST),)
+ifeq ($(OPENSSL_LIBS),)
+$(error OPENSSL_LIBS must be define in order to use WITH_OPENSSL_*)
+endif
+endif
+
+#
+#  Definitions for the generic logging framework
+#
+LOG_ID_LIB := 0
+LOG_ID_SECTION := 0
+CFLAGS += -DLOG_ID_LIB=$(LOG_ID_LIB) -DLOG_ID_SECTION=$(LOG_ID_SECTION)
+
+# Path to clang, setting this enables the 'scan.*' build targets
+# which perform static analysis on various server components.
+ANALYZE.c       := @clang_path@
+
+#
+#  Have wrappers for the test tools, so that they run.
+#
+TEST_BIN_DIR = ./$(BUILD_DIR)/bin/local
+TEST_BIN    =  $(JLIBTOOL) $(if ${VERBOSE},--debug,--silent) --mode=execute $(TEST_BIN_DIR)
+
+#
+#  For creating documentation via doc/all.mk
+#
+ASCIIDOCTOR := @ASCIIDOCTOR@
+PANDOC := @PANDOC@
+PANDOC_ENGINE := @PANDOC_ENGINE@
+DOXYGEN := @DOXYGEN@
+GRAPHVIZ_DOT := @GRAPHVIZ_DOT@
+ANTORA := @ANTORA@

@@ -1,0 +1,15 @@
+imap_tls.authenticate
+
+if (ok) {
+    &control.Auth-Type := Accept
+}
+else {
+    reject
+}
+
+if (&TLS-Certificate.Issuer =~ /@example\.org/) {
+    test_pass
+} else {
+    test_fail
+}
+

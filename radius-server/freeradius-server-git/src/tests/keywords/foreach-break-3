@@ -1,0 +1,18 @@
+#
+#  PRE: foreach foreach-break
+#
+&Calling-Station-Id := "8"
+
+&control.Calling-Station-Id := { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g" }
+
+foreach &control.Calling-Station-Id {
+	if (&Calling-Station-Id == "%{Foreach-Variable-0}") {
+		success
+		break
+	}
+	elsif ("%{Foreach-Variable-0}" == '9') {
+		test_fail
+
+		reject
+	}
+}

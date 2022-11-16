@@ -1,0 +1,12 @@
+#
+#  Input packet
+#
+Packet-Type = Access-Request
+User-Name = "tony"
+User-Password = "taponi"
+Called-Station-Id = "aabbccddeeff"
+
+#
+#  Expected answer
+#
+Packet-Type == Access-Accept

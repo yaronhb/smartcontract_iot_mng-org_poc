@@ -1,0 +1,98 @@
+#
+#  PRE: if 
+#
+&Framed-IP-Address := 127.0.0.1
+&Tmp-Octets-0 := &Framed-IP-Address
+
+&Tmp-String-0 := "%(unpack:%{Tmp-Octets-0} 0 ipaddr)"
+&Tmp-IP-Address-0 := "%(unpack:%{Tmp-Octets-0} 0 ipaddr)"
+
+if (&Tmp-String-0 != "127.0.0.1") {
+	test_fail
+}
+
+if (&Tmp-IP-Address-0 != 127.0.0.1) {
+	test_fail
+}
+
+&Tmp-Octets-0 := 0x000001020304
+&Tmp-Integer-0 := "%(unpack:%{Tmp-Octets-0} 4 uint16)"
+
+# Octets 4 and 5 == 0x0304 == 772
+if (&Tmp-Integer-0 != 772) {
+	test_fail
+}
+
+# truncation
+&Tmp-String-0 := "0x0011223344556677"
+&Tmp-String-1 := "%(unpack:%{Tmp-String-0} 0 ether)"
+if (&Tmp-String-1 != "00:11:22:33:44:55") {
+	test_fail
+}
+
+&Tmp-String-0 := "0x48656C6C6F"
+&Tmp-String-1 := "%(unpack:%{Tmp-String-0} 0 string)"
+if (&Tmp-String-1 != "Hello") {
+	test_fail
+}
+
+# Offset beyond data length
+&request -= &Tmp-String-1[*]
+&Tmp-String-1 := "%(unpack:%{Tmp-String-0} 10 string)"
+
+if (&Tmp-String-1) {
+	test_fail
+}
+
+if (&Module-Failure-Message != "unpack offset 10 is larger than input data length 5") {
+	test_fail
+}
+&request -= &Module-Failure-Message[*]
+
+# Invalid destination data type
+&Tmp-String-1 := "%(unpack:%{Tmp-String-0} 0 thing)"
+if (&Tmp-String-1) {
+	test_fail
+}
+
+if (&Module-Failure-Message != "Invalid data type 'thing'") {
+	test_fail
+}
+
+# Invalid source data type
+&Tmp-String-1 := "%(unpack:%{Tmp-Integer-0} 0 string)"
+if (&Tmp-String-1) {
+	test_fail
+}
+
+if (&Module-Failure-Message != "unpack requires the input attribute to be 'string' or 'octets'") {
+	test_fail
+}
+&request -= &Module-Failure-Message[*]
+
+# Invalid hex string
+&Tmp-String-0 := '0x014sdgw'
+&Tmp-String-1 := "%(unpack:%{Tmp-String-0} 0 string)"
+
+if (&Tmp-String-1) {
+	test_fail
+}
+
+if (&Module-Failure-Message != "Invalid hex string in '0x014sdgw'") {
+	test_fail
+}
+&request -= &Module-Failure-Message[*]
+
+# Zero length hex string
+&Tmp-String-0 := '0x'
+&Tmp-String-1 := "%(unpack:%{Tmp-String-0} 0 string)"
+
+if (&Tmp-String-1) {
+	test_fail
+}
+
+if (&Module-Failure-Message != "Zero length hex string in '0x'") {
+	test_fail
+}
+
+success

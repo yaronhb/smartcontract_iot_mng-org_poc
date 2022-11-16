@@ -1,0 +1,12 @@
+scripts/upgrade/clients.pl
+scripts/util/create-users.pl
+scripts/util/cryptpasswd
+scripts/exec-program-wait
+scripts/ldap/radiusd2ldif.pl
+scripts/cron/radiusd.cron.daily
+scripts/cron/radiusd.cron.monthly
+scripts/util/radiusd.sh
+scripts/sql/radsqlrelay
+scripts/rc.radiusd
+scripts/sql/users2mysql.pl
+debian/tmp/etc/freeradius/certs

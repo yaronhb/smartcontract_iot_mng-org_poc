@@ -1,0 +1,233 @@
+#  -*- text -*-
+######################################################################
+#
+#	As of version 4.0.0, the server also supports the TACACS+
+#	protocol.
+#
+#	$Id$
+#
+######################################################################
+
+server tacacs {
+	#
+	#  namespace:: Needs to be "tacacs" for TACACS+ functionality.
+	#
+	namespace = tacacs
+
+	listen {
+		#
+		#  type:: The type of packet to accept.
+		#
+		#  Multiple types can be accepted by using multiple
+		#  lines of `type = ...`.
+		#
+		#  As described in RFC https://tools.ietf.org/id/draft-ietf-opsawg-07.html#rfc.section.5,
+		#  the packet types are:
+		#
+		type = Authentication-Start
+		type = Authentication-Continue
+		type = Authorization-Request
+		type = Accounting-Request
+
+		#
+		#  transport:: The transport protocol.
+		#
+		#  Only `tcp` is allowed.  TACACS+ does not use UDP or TLS.
+		#
+		transport = tcp
+
+		#
+		#  ## Protocols
+		#
+		#  tcp { ... }:: TCP is configured here.
+		#
+		tcp {
+			#
+			#  NOTE: Don't change anything if you are not sure.
+			#
+
+			#
+			#  port:: The port where we accept packets.
+			#
+			#  The port should be 49 for a production network.
+			#
+			port = 49
+
+			#
+			#  ipaddr:: The IP address where we accept packets.
+			#
+			ipaddr = *
+
+			#
+			#  interface:: Interface to bind to.
+			#
+#			interface = eth0
+
+			#
+			#  max_packet_size:: Our max packet size. may be different from the parent.
+			#
+#			max_packet_size = 4096
+
+			#
+			#  recv_buff:: How big the kernel's receive buffer should be.
+			#
+#			recv_buff = 1048576
+
+			#
+			#  send_buff:: How big the kernel's send buffer should be.
+			#
+#			send_buff = 1048576
+
+			#
+			#  src_ipaddr:: IP we open our socket on.
+			#
+#			src_ipaddr = ""
+		}
+	}
+
+	#
+	#  ## Authentication-Start
+	#
+
+	#
+	#  ### Recv
+	#
+ 	recv Authentication-Start {
+		-sql
+
+		#
+		#  Set _our_ authentication method to the _requested_ one.
+		#
+		&control.Auth-Type := &Authentication-Type
+	}
+
+	authenticate PAP {
+		tacacs_pap
+	}
+
+	authenticate CHAP {
+		tacacs_chap
+	}
+
+	authenticate MSCHAP {
+		tacacs_mschap
+	}
+
+	authenticate MSCHAPv2 {
+		tacacs_mschap
+	}
+
+	#
+	#  Do challenge-response here.
+	#
+	authenticate ASCII {
+		fail
+	}
+
+	#
+	#  ### Send
+	#
+	send Authentication-Start-Reply {
+		if (&Authentication-Status == Pass) {
+			&reply.Server-Message := "Hello %{User-Name}"
+		}
+	}
+
+	#
+	#  ## Authentication-Continue
+	#
+	#  This should handle ASCII methods as PAP with challenge-response.
+	#
+
+	#
+	#  ### Recv
+	#
+	recv Authentication-Continue {
+		#
+		#	https://tools.ietf.org/id/draft-ietf-opsawg-07.html#rfc.section.4.3
+		#
+		"%{Authentication-Continue-Flags}"
+		"%{User-Message}"
+		"%{Data}"
+	}
+
+	#
+	#  ### Send
+	#
+	send Authentication-Continue-Reply {
+		if (&Authentication-Status == Pass) {
+			&reply.Server-Message := "Hello %{User-Name}"
+		}
+	}
+
+	#
+	#	## Authorization
+	#
+
+	#
+	#	### Recv
+	#
+	recv Authorization-Request {
+		"%{Authentication-Method}"
+		"%{Privilege-Level}"
+		"%{Authentication-Type}"
+		"%{Authentication-Service}"
+		"%{User-Name}"
+		"%{Client-Port}"
+		"%{Remote-Address}"
+		"%{ArgumentList}"
+	}
+
+	#
+	#	### Send
+	#
+	send Authorization-Reply {
+		&reply.Authorization-Status := Pass-Add
+		&reply.Server-Message := "authorization-response-server"
+		&reply.Data := "authorization-response-data"
+		&reply.ArgumentList := "key1=var1"
+	}
+
+	#
+	#	## Accounting
+	#
+
+	#
+	#	### Recv
+	#
+	recv Accounting-Request {
+		#
+		#  Create a 'detail'ed log of the packets.
+		#
+		detail
+	}
+
+	#  First packet for a session
+	accounting Start {
+	}
+
+	#  Updates a previous start
+	accounting Watchdog-Update {
+	}
+
+	#  Updates a session
+	accounting Watchdog {
+	}
+
+	#  Stops a session
+	accounting Stop {
+	}
+
+	#
+	#	### Send
+	#
+	send Accounting-Reply {
+		&reply.Accounting-Status := Success
+		&reply.Server-Message := "Success"
+		&reply.Data := 0x00
+	}
+
+	#
+	#	NOTE: Proxying of TACACS+ requests is NOT supported.
+	#
+}

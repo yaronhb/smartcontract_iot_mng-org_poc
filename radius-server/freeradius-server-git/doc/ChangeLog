@@ -1,0 +1,36 @@
+FreeRADIUS 4.0.0 Sun 10 Jul 2016 15:48:14 EDT urgency=medium
+	Feature improvements
+	* For upgrade instructions, see doc/upgrade/index.adoc
+	* "authorize", "authenticate", "preacct", etc.
+	  are no longer used.
+	* Dropped support for -i and -p flags in radiusd
+	* New "map" function in unlang.  See "man unlang".
+	* The "load-balance" and "redundant-load-balance"
+	  sections now accept a key.  See "man unlang".
+	* The EAP module tracks certificates in a different
+	  attribute list.  See the upgrade instructions.
+	* The EAP module produces much better messages
+	  when using TLS.
+	* The MySQL and Postgresql modules now call the
+	  database string escape functions, instead of
+	  using "safe_characters".
+	* radsniff stats (-W) now operates on PCAP files too.
+	* radsniff stats can be printed in CSV format.
+	* radsniff processes .1Q tagged packets by default.
+	* Redis cluster support for all Redis modules.
+	* TLV Attributes can now be nested to nearly any depth.
+	* radsnmp client which can listen on Net-SNMP "pass persist"
+	  and translate that into queries to the server.
+	* rlm_perl: radiusd::xlat to evaluate xlat string within
+	  perl script
+	* rlm_ldap supports maps, which can map the contents
+	  of multiple LDAP objects to RADIUS attributes.
+	* Both the rlm_ldap map and xlat functions support server
+	  side sort control specifiers in their URLs.
+	* rlm_eap supports RSA/ECC key agility.
+
+	Bug fixes
+	* Attribute names in unlang MUST be prefixed with &
+	  This fixes a host of ambiguities when parsing.
+	* Added unit tests for dictionary parsing and
+	  restrictions on which attributes can appear where.

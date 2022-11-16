@@ -1,0 +1,34 @@
+parallel {
+	group {
+		&parent.control += {
+			&Tmp-Integer-0 = 1
+		}
+	}
+	group {
+		&parent.control += {
+			&Tmp-Integer-0 = 3
+		}
+	}
+	group {
+		&parent.control += {
+			&Tmp-Integer-0 = 5
+		}
+	}
+	group {
+		&parent.control += {
+			&Tmp-Integer-0 = 7
+		}
+	}
+}
+
+if ("%{control.Tmp-Integer-0[#]}" != 4) {
+	test_fail
+}
+
+#
+#  We can't check order, as there's offically no guarantee on the
+#  order in which child sections will be evaluated.
+#
+
+
+success

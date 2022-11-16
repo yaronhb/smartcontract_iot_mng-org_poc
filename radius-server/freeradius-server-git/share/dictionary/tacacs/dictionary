@@ -1,0 +1,17 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+#
+#	The FreeRADIUS Vendor-Specific dictionary for SNMP operations.
+#
+# Version:	$Id$
+#
+
+PROTOCOL	TACACS		5	format=4
+BEGIN-PROTOCOL TACACS
+
+$INCLUDE dictionary.freeradius.internal
+$INCLUDE dictionary.tacacs
+
+END-PROTOCOL TACACS

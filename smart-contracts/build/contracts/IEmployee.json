@@ -1,0 +1,496 @@
+{
+  "contractName": "IEmployee",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "employee_id",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "employee_name",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "employee_address",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"employee_address\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"employee_id\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"employee_name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/IEmployee.sol\":\"IEmployee\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/IEmployee.sol\":{\"keccak256\":\"0x6ba9892a36f57dcd320ca4c42f6d3f3e6d8138eb521a8c31294211d04958db0f\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://83287472abe5b66bc30c264b84f926c5b99c696df01d37061855348701b2a9a2\",\"dweb:/ipfs/QmYWq4gXr3ZVNVY7KBKnyHQY7HUBfvV7oTDGgRX32hMQd5\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity >= 0.8.13;\n\ninterface IEmployee {\n    function employee_id() external view returns (bytes32);\n    function employee_name() external view returns (string memory);\n    function employee_address() external view returns (address);\n}\n\ninterface IEmployeeFactory {\n    struct ConstructingData {\n        bytes32 id;\n        string name;\n        address employee_addr;\n    }\n\n    function make(ConstructingData memory data) external returns (IEmployee);\n}",
+  "sourcePath": "/Users/mi/Dropbox (Technion Dropbox)/main/courses/M.Sc. Technion Courses/236332:3 - IoT -  Technologies and Implementations & Project in IoT/Project/contracts/contracts/IEmployee.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/IEmployee.sol",
+    "exportedSymbols": {
+      "IEmployee": [
+        772
+      ],
+      "IEmployeeFactory": [
+        789
+      ]
+    },
+    "id": 790,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 756,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".13"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:26:6"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IEmployee",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 772,
+        "linearizedBaseContracts": [
+          772
+        ],
+        "name": "IEmployee",
+        "nameLocation": "70:9:6",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "387dbcab",
+            "id": 761,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "employee_id",
+            "nameLocation": "95:11:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 757,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "106:2:6"
+            },
+            "returnParameters": {
+              "id": 760,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 759,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 761,
+                  "src": "132:7:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 758,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "132:7:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "131:9:6"
+            },
+            "scope": 772,
+            "src": "86:55:6",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "768b886d",
+            "id": 766,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "employee_name",
+            "nameLocation": "155:13:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 762,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "168:2:6"
+            },
+            "returnParameters": {
+              "id": 765,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 764,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 766,
+                  "src": "194:13:6",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 763,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "194:6:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "193:15:6"
+            },
+            "scope": 772,
+            "src": "146:63:6",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "2ad1acf0",
+            "id": 771,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "employee_address",
+            "nameLocation": "223:16:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 767,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "239:2:6"
+            },
+            "returnParameters": {
+              "id": 770,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 769,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 771,
+                  "src": "265:7:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 768,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "265:7:6",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "264:9:6"
+            },
+            "scope": 772,
+            "src": "214:60:6",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 790,
+        "src": "60:216:6",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IEmployeeFactory",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 789,
+        "linearizedBaseContracts": [
+          789
+        ],
+        "name": "IEmployeeFactory",
+        "nameLocation": "288:16:6",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IEmployeeFactory.ConstructingData",
+            "id": 779,
+            "members": [
+              {
+                "constant": false,
+                "id": 774,
+                "mutability": "mutable",
+                "name": "id",
+                "nameLocation": "353:2:6",
+                "nodeType": "VariableDeclaration",
+                "scope": 779,
+                "src": "345:10:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 773,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "345:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 776,
+                "mutability": "mutable",
+                "name": "name",
+                "nameLocation": "372:4:6",
+                "nodeType": "VariableDeclaration",
+                "scope": 779,
+                "src": "365:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 775,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "365:6:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 778,
+                "mutability": "mutable",
+                "name": "employee_addr",
+                "nameLocation": "394:13:6",
+                "nodeType": "VariableDeclaration",
+                "scope": 779,
+                "src": "386:21:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 777,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "386:7:6",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "ConstructingData",
+            "nameLocation": "318:16:6",
+            "nodeType": "StructDefinition",
+            "scope": 789,
+            "src": "311:103:6",
+            "visibility": "public"
+          },
+          {
+            "functionSelector": "0db0be7a",
+            "id": 788,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "make",
+            "nameLocation": "429:4:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 783,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 782,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "458:4:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 788,
+                  "src": "434:28:6",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_ConstructingData_$779_memory_ptr",
+                    "typeString": "struct IEmployeeFactory.ConstructingData"
+                  },
+                  "typeName": {
+                    "id": 781,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 780,
+                      "name": "ConstructingData",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 779,
+                      "src": "434:16:6"
+                    },
+                    "referencedDeclaration": 779,
+                    "src": "434:16:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_ConstructingData_$779_storage_ptr",
+                      "typeString": "struct IEmployeeFactory.ConstructingData"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "433:30:6"
+            },
+            "returnParameters": {
+              "id": 787,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 786,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 788,
+                  "src": "482:9:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IEmployee_$772",
+                    "typeString": "contract IEmployee"
+                  },
+                  "typeName": {
+                    "id": 785,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 784,
+                      "name": "IEmployee",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 772,
+                      "src": "482:9:6"
+                    },
+                    "referencedDeclaration": 772,
+                    "src": "482:9:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IEmployee_$772",
+                      "typeString": "contract IEmployee"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "481:11:6"
+            },
+            "scope": 789,
+            "src": "420:73:6",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 790,
+        "src": "278:217:6",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:463:6"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.13+commit.abaa5c0e.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.9",
+  "updatedAt": "2022-11-02T11:34:14.150Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

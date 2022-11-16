@@ -1,0 +1,13 @@
+#
+#  PRE: switch
+#
+switch &User-Name {
+	case "%{no-such-module:bob}" {	# ERROR
+		test_fail
+	}
+
+	case {
+		Filter-Id := "default"
+	}
+
+}

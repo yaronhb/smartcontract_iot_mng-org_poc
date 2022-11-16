@@ -1,0 +1,31 @@
+#
+#  Async calls should always return a zero length string
+#  because we don't wait for the response.
+#
+&Tmp-String-0 := "%(exec_async:/bin/sh -c 'echo -n hello')"
+if (&Tmp-String-0) {
+	test_fail
+}
+
+exec_async_mod
+
+if (ok) {
+	test_pass
+}
+
+#
+#  Async calls should not have their output added to the request
+#
+
+if (&reply.Reply-Message == 'hello') {
+	test_fail
+}
+
+#
+#  Smoke test - Setup an async process that'll keep running after
+#  after the test exits.
+#
+&Tmp-String-0 := "%(exec_async:/bin/sh -c 'sleep 1')"
+if (&Tmp-String-0) {
+	test_fail
+}

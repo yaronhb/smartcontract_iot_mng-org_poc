@@ -1,0 +1,11 @@
+# PRE: if
+#
+#  Matching "if" conditions
+#
+if (&User-Name == "bob") {
+	success
+}
+
+if (&User-Name != "bob") {
+	test_fail
+}

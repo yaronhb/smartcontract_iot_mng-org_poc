@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "random-char": "^1.0.4",
+    "redis": "^4.4.0",
+    "solregex": "^0.3.1"
+  }
+}

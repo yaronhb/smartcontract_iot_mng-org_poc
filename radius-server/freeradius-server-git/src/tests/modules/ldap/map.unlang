@@ -1,0 +1,31 @@
+map ldap "ldap:///ou=profiles,dc=example,dc=com??sub?(objectClass=radiusprofile)" {
+	&Tmp-String-0 := 'radiusFramedIPNetmask'
+	&Tmp-String-1 += 'entryDN'
+}
+
+if (!updated) {
+	test_fail
+}
+
+if (&Tmp-String-0 != '255.255.255.0') {
+	test_fail
+}
+
+if (&Tmp-String-1[*] != 'cn=radprofile,ou=profiles,dc=example,dc=com') {
+	test_fail
+}
+
+if (&Tmp-String-1[*] != 'cn=profile1,ou=profiles,dc=example,dc=com') {
+	test_fail
+}
+
+map ldap "ldap:///ou=profiles,dc=example,dc=com??sub?(objectClass=notARealObject)" {
+	&Tmp-String-0 := 'radiusFramedIPNetmask'
+	&Tmp-String-1 += 'entryDN'
+}
+
+if (!notfound) {
+	test_fail
+}
+
+test_pass

@@ -1,0 +1,47 @@
+#
+# PRE:
+#
+
+&Tmp-String-0 := "foo"
+&Tmp-String-1 := "bar"
+
+#
+#  First choice
+#
+&Tmp-String-2 := "%{%{Tmp-String-0[0]}:-%{Tmp-String-1[0]}}"
+if (&Tmp-String-2[0] != 'foo') {
+	test_fail
+}
+
+#
+#  Second choice
+#
+&request -= &Tmp-String-0[*]
+&Tmp-String-2 := "%{%{Tmp-String-0[0]}:-%{Tmp-String-1[0]}}"
+if (&Tmp-String-2[0] != 'bar') {
+	test_fail
+}
+
+#
+#  Multiple things in an alternation
+#
+&Tmp-String-2 := "%{%{Tmp-String-0[0]}:-%{Tmp-String-1[0]} foo}"
+if !(&Tmp-String-2[0] == 'bar foo') {
+	test_fail
+}
+
+#
+#  Everything null
+#
+&request -= &Tmp-String-1[*]
+&request -= &Tmp-String-2[*]
+
+#
+#  Both sides are failing, so the assignment here fails, too.
+#
+&Tmp-String-2 := "%{%{Tmp-String-0[0]}:-%{Tmp-String-1[0]}}"
+if (&Tmp-String-2[0]) {
+	test_fail
+}
+
+success

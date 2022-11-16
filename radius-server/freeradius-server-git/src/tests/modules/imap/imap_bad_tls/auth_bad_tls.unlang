@@ -1,0 +1,7 @@
+imap_bad_tls.authenticate
+if (ok) {
+    &control.Auth-Type := Accept
+}
+else {
+    reject
+}

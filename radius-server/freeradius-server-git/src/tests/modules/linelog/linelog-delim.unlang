@@ -1,0 +1,43 @@
+&control.Exec-Export := 'PATH="$ENV{PATH}:/bin:/usr/bin:/opt/bin:/usr/local/bin"'
+
+#
+#  Remove old log files
+#
+group {
+	&Tmp-String-0 := `/bin/sh -c "rm $ENV{MODULE_TEST_DIR}/test_delim.log"`
+
+	#
+	#  We can only over-ride actions in an "actions" subsection,
+	#  and then only as the last item in a group.
+	#
+	actions {
+		fail = 1
+	}
+}
+if (fail) {
+	ok
+}
+
+linelog_fmt_delim
+&Tmp-String-0 := `/bin/sh -c "tail -n1 $ENV{MODULE_TEST_DIR}/test_delim.log"`
+
+if (&Tmp-String-0 == 'bob, ') {
+	test_pass
+}
+else {
+	test_fail
+}
+
+#  Check strings are appended
+linelog_fmt_delim
+&Tmp-String-0 := `/bin/sh -c "tail -n1 $ENV{MODULE_TEST_DIR}/test_delim.log"`
+
+if (&Tmp-String-0 == 'bob, bob, ') {
+	test_pass
+}
+else {
+	test_fail
+}
+
+#  Remove the file
+&Tmp-String-0 := `/bin/sh -c "rm $ENV{MODULE_TEST_DIR}/test_delim.log"`

@@ -1,0 +1,23 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC 8115 - DHCPv6 Option for IPv4-Embedded Multicast and Unicast IPv6 Prefixes
+#
+#  $Id$
+#
+##############################################################################
+
+#
+#  There's currently no way to enforce lengths on prefixes.  We can make these fields
+#  all "ipv6prefix", in which case they will be decoded correctly.  But then they may
+#  not be encoded correctly.
+#
+ATTRIBUTE	Prefix64				113	struct
+MEMBER		ASM-Length				uint8		# MUST have value 96
+MEMBER		ASM-Prefix				octets[7]	# IPv6 prefix
+MEMBER		SSM-Length				uint8		# MUST have value 96
+MEMBER		SSM-Prefix				octets[7]	# IPv6 prefix
+MEMBER		Unicast					ipv6prefix	# MUST have prefix 32, 40, 48, 56, 64, 96

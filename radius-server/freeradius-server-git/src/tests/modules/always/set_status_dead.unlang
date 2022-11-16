@@ -1,0 +1,14 @@
+#
+#  Set the module status to dead, call it and check that it fails
+#
+%(db_status:fail)
+
+db_status {
+	fail = 1
+}
+
+if (fail) {
+	&reply.Reply-Message := "success"
+}
+
+&control.Password.Cleartext := "hello"

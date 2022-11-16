@@ -1,0 +1,77 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC 8156 - DHCPv6 Failover Protocol
+#
+#  $Id$
+#
+##############################################################################
+
+ATTRIBUTE	Failover-Binding-Status			114	uint8
+VALUE	Failover-Binding-Status		Active			1
+VALUE	Failover-Binding-Status		Expired			2
+VALUE	Failover-Binding-Status		Released		3
+VALUE	Failover-Binding-Status		Pending-Free		4
+VALUE	Failover-Binding-Status		Free			5
+VALUE	Failover-Binding-Status		Free-Bakcup		6
+VALUE	Failover-Binding-Status		Abandoned		7
+VALUE	Failover-Binding-Status		Reset			8
+
+ATTRIBUTE	Failover-Connect-Flags			115	uint16
+VALUE	Failover-Connect-Flags		Fixed-PD-Length		1
+
+ATTRIBUTE	Failover-DNS-Removal-Info		116	group
+
+#
+#  The next 3 attributes can only occur inside of Failover-DNS-Removal-Info.
+#  However, in DHCPv6, the attribute number space is global.
+#
+ATTRIBUTE	Host-Name				117	string dns_label
+ATTRIBUTE	Zone-Name				118	string dns_label
+
+ATTRIBUTE	Flags					119	uint16
+VALUE	Flags				Fwd-Up-To-Date		0x01
+VALUE	Flags				Rev-Up-To-Date		0x02
+VALUE	Flags				Synthesized-Name	0x04
+VALUE	Flags				Using-Requested-FQDN	0x08
+
+ATTRIBUTE	Failover-Expiration-Time		120	date
+ATTRIBUTE	Failover-Max-Unacked-BNDUPD		121	uint32
+ATTRIBUTE	Failover-Max-Client-Lead-Time		122	uint32
+ATTRIBUTE	Failover-Max-Partner-Lifetime		123	date
+ATTRIBUTE	Failover-Partner-Lifetime-Sent		124	date
+ATTRIBUTE	Failover-Partner-Down-Time		125	date
+ATTRIBUTE	Failover-Partner-Raw-CLT-Time		126	date
+ATTRIBUTE	Failover-Protocol-Version		127	struct
+MEMBER		Major					uint16
+MEMBER		Minor					uint16
+
+ATTRIBUTE	Failover-Keepalive-Time			128	uint32
+ATTRIBUTE	Failover-Reconfigure-Data		129	struct
+MEMBER		Time					date
+MEMBER		Key					octets
+
+ATTRIBUTE	Failover-Relationship-Name		130	string
+
+ATTRIBUTE	Failover-Server-Flags			131	uint8
+VALUE	Failover-Server-Flags		Communicated		0x01
+VALUE	Failover-Server-Flags		Startup			0x02
+VALUE	Failover-Server-Flags		ACK-Startup		0x04
+
+ATTRIBUTE	Failover-Server-State			132	uint8
+VALUE	Failover-Server-State		Startup			1
+VALUE	Failover-Server-State		Normal			2
+VALUE	Failover-Server-State		Communications-Interrupted 3
+VALUE	Failover-Server-State		Partner-Down		4
+VALUE	Failover-Server-State		Potential-Conflict	5
+VALUE	Failover-Server-State		Recover			6
+VALUE	Failover-Server-State		Recover-Wait		7
+VALUE	Failover-Server-State		Recover-Done		8
+VALUE	Failover-Server-State		Resolution-Interrupted	9
+VALUE	Failover-Server-State		Conflict-Done		10
+
+ATTRIBUTE	Failover-Start-Time-Of-State		133	date
+ATTRIBUTE	Failover-State-Expiration-Time		134	date

@@ -1,0 +1,76 @@
+= Data Types
+
+Unlang supports a number of data types. These data types are used in
+conditional expressions or when assigning a value to an attribute.
+
+== Using Data Types
+
+The server support a wide range of data types, as given in the
+xref:type/all_types.adoc[list of data types] page.  The choice
+of which data type applies is determined by the context in which that
+data type is used.  This context is usually taken from an attribute
+which is being assigned a value.
+
+The `unlang` interpreter uses pre-defined attributes which are defined
+in dictionaries.  The dictionaries define both a name, and a data type
+for the attributes.  In the interpreter, then, attributes can be
+assigned a value or compared to a value, without specifying the data
+type.  The interpreter knows how to parse the value by using the data
+type assigned to the attribute.
+
+The result is that in most cases, it is not necessary to know the name
+of the data types.  It is possible to write values in the format you
+expect, and he server will do "the right thing" when interpreting the
+values.
+
+.Attributes with Different Data Types
+[source,unlang]
+----
+Framed-IP-Address = 192.0.2.1
+Framed-IPv6-Address = 2001:db8::
+Reply-Message = "This is a reply"
+Port-Limit = 5
+Boolean = true
+Octets-Thing = 0xabcdef0102030405
+MAC-Address = 00:01:02:03:04:05
+----
+
+== Parsing Data Types
+
+The interpreter is flexible when parsing data types.  So long as the
+value can be parsed as the given data type without error, the value
+will be accepted.
+
+For example, a particular attribute may be of data type `ipaddr` in
+order to store IPv4 addresses.  The interpreter will then accept the
+following strings as valid IPv4 addresses:
+
+`192.168.0.2`:: xref:type/string/unquoted.adoc[Unquoted text], interpreted as the data type
+
+`'192.168.0.2'`:: xref:type/string/single.adoc[Single-quoted string], the contents of the string are parsed as the data type.
++
+The single-quoted string form is most useful when the data type
+contains special characters that may otherwise confuse the parser.
+
+`"192.168.0.2"`:: xref:type/string/double.adoc[Double-quoted string].
++
+The contents of the string are dynamically expanded as described in
+the xref:unlang/xlat/index.adoc[dynamic expansion] page.  The
+resulting output is then interpreted as the given data type.
+
+`{backtick}/bin/echo 192.168.0.2{backtick}`:: xref:type/string/backticks.adoc[backtick-quoted string].
+Run a script, and parse the resulting string as the data type.
+
+Similar processing rules are applied when parsing assignments and
+comparisons, for all attributes and data types.
+
+=== Casting Data Types
+
+Values can be xref:type/cast.adoc[cast] from one data type to another.
+However, this cast only changes the _type_ of the data, it does not
+change the datas _value_.  That is, a cast allows you to convert an
+`octets` data type to a `string`, but the resulting `string` may still
+contain non-printable characters.
+
+// Copyright (C) 2021 Network RADIUS SAS.  Licenced under CC-by-NC 4.0.
+// Development of this documentation was sponsored by Network RADIUS SAS.

@@ -1,0 +1,13 @@
+&control.Auth-Type := 'Accept'
+&reply.Reply-Message := 'pass'
+
+
+# Section should exit after this statement
+ok {
+	ok = return
+}
+
+#
+#  If we hit this statement, that's an error.
+#
+test_fail

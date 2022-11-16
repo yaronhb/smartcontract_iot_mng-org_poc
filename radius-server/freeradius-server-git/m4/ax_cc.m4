@@ -1,0 +1,493 @@
+dnl #
+dnl # check if were compiling with CLANG, autoconf GCC macro identifies CLANG as GCC
+dnl #
+AC_DEFUN([AX_CC_IS_CLANG],[
+  AC_CACHE_CHECK([if compiler is clang], [ax_cv_cc_clang],[
+
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([], [[
+    #ifndef __clang__
+         not clang
+    #endif
+    ]])],
+    [ax_cv_cc_clang=yes],
+    [ax_cv_cc_clang=no])
+  ])
+])
+
+dnl #
+dnl # clang and gcc originally used different flags to specify c11 support
+dnl #
+AC_DEFUN([AX_CC_STD_C11],[
+  AC_CACHE_CHECK([for the compiler flag to enable C11 support], [ax_cv_cc_std_c11_flag],[
+    ax_cv_cc_std_c11_flag=
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -std=c11"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [
+        struct foo {
+          union {
+            int a;
+            int b;
+          };
+        } bar;
+      ],
+      [ax_cv_cc_std_c11_flag="-std=c11"])
+
+    if test "x$ax_cv_cc_std_c11_flag" = x; then
+      CFLAGS="$CFLAGS_SAVED -std=c1x"
+      AC_TRY_COMPILE(
+        [],
+        [
+          struct foo {
+            union {
+              int a;
+              int b;
+            };
+          } bar;
+        ],
+        [ax_cv_cc_std_c11_flag="-std=c1x"])
+    fi
+
+    AC_LANG_POP
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+dnl #
+dnl # clang and gcc originally used different flags to specify c11 support
+dnl #
+AC_DEFUN([AX_CC_UNWINDLIB_ARG],[
+  AC_CACHE_CHECK([if the compiler accepts --unwindlib], [ax_cv_cc_unwindlib_arg],[
+    LDFLAGS_SAVED=$LDFLAGS
+    LDFLAGS="$LDFLAGS -Werror --rtlib=compiler-rt --unwindlib=libunwind"
+
+    AC_LINK_IFELSE(
+    [
+      AC_LANG_SOURCE(
+      [
+        int main(int argc, char **argv) {
+          return 0;
+        }
+      ])
+    ],
+      [ax_cv_cc_unwindlib_arg=yes],
+      [ax_cv_cc_unwindlib_arg=no]
+    )
+
+    LDFLAGS="$LDFLAGS_SAVED"
+  ])
+])
+
+
+dnl #
+dnl #  Check if we have the _Generic construct
+dnl #
+AC_DEFUN([AX_CC_HAVE_C11_GENERIC],
+[
+AC_CACHE_CHECK([for _Generic support in compiler], [ax_cv_cc_c11_generic],[
+  AC_COMPILE_IFELSE(
+    [
+      AC_LANG_SOURCE(
+      [
+        int main(int argc, char **argv) {
+          int foo = 1;
+          return _Generic(foo, int: 0, char: 1);
+        }
+      ])
+    ],
+    [ax_cv_cc_c11_generic=yes],
+    [ax_cv_cc_c11_generic=no]
+  )
+])
+if test "x$ax_cv_cc_c11_generic" = "xyes"; then
+  AC_DEFINE([HAVE_C11_GENERIC],1,[Define if the compiler supports the C11 _Generic construct])
+fi
+])
+
+AC_DEFUN([AX_CC_QUNUSED_ARGUMENTS_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-Qunused-arguments"], [ax_cv_cc_qunused_arguments_flag],[
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Qunused-arguments -foobar"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_qunused_arguments_flag="yes"],
+      [ax_cv_cc_qunused_arguments_flag="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_NO_UNKNOWN_WARNING_OPTION_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-Wno-unknown-warning-option"], [ax_cv_cc_no_unknown_warning_option_flag],[
+
+  CFLAGS_SAVED=$CFLAGS
+  CFLAGS="-Werror -Wno-unknown-warning-option"
+
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([], [[
+    /*
+     *  gcc will happily accept -Wno-unknown-warning-option
+     *  only emitting an error about it, if an error ocurrs in the source file.
+     */
+    #if defined(__GNUC__) && !defined(__clang__)
+        gcc sucks
+    #endif
+
+    return 0;
+    ]])],
+    [ax_cv_cc_no_unknown_warning_option_flag=yes],
+    [ax_cv_cc_no_unknown_warning_option_flag=no])
+
+  CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_WDECLARATION_AFTER_STATEMENT_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-Wdeclaration-after-statement"],  [ax_cv_cc_wdeclaration_after_statement_flag],[
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Wdeclaration-after-statement"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_wdeclaration_after_statement_flag="yes"],
+      [ax_cv_cc_wdeclaration_after_statement_flag="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_WEVERYTHING_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-Weverything"], [ax_cv_cc_weverything_flag],[
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Weverything -Wno-reserved-id-macro -Wno-unused-macros -Wno-unreachable-code-return -Wno-poison-system-directories"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_weverything_flag="yes"],
+      [ax_cv_cc_weverything_flag="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_WDOCUMENTATION_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-Wdocumentation"], [ax_cv_cc_wdocumentation_flag],[
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Wdocumentation"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_wdocumentation_flag="yes"],
+      [ax_cv_cc_wdocumentation_flag="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_IMPLICIT_FALLTHROUGH_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-Wimplicit-fallthrough"], [ax_cv_cc_wimplicit_fallthrough_flag],[
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Wimplicit-fallthrough"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_wimplicit_fallthrough_flag="yes"],
+      [ax_cv_cc_wimplicit_fallthrough_flag="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_NO_DATE_TIME_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-Wno-date-time"], [ax_cv_cc_no_date_time_flag],[
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Wno-date-time"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_no_date_time_flag="yes"],
+      [ax_cv_cc_no_date_time_flag="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_PTHREAD_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-pthread"], [ax_cv_cc_pthread_flag],[
+
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -pthread"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_pthread_flag="yes"],
+      [ax_cv_cc_pthread_flag="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+AC_DEFUN([AX_CC_SANITZE_ADDRESS_USE_AFTER_SCOPE_FLAG],[
+  AC_CACHE_CHECK([for the compiler flag "-fsanitize-address-use-after-scope"], [ax_cv_cc_sanitize_address_use_after_scope],[
+
+    dnl # Need -fsanitize=address else we get an unused argument error
+    CFLAGS_SAVED=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -fsanitize=address -fsanitize-address-use-after-scope"
+
+    AC_LANG_PUSH(C)
+    AC_TRY_COMPILE(
+      [],
+      [return 0;],
+      [ax_cv_cc_sanitize_address_use_after_scope="yes"],
+      [ax_cv_cc_sanitize_address_use_after_scope="no"])
+    AC_LANG_POP
+
+    CFLAGS="$CFLAGS_SAVED"
+  ])
+])
+
+dnl #
+dnl #  Check if we have the choose expr builtin
+dnl #
+AC_DEFUN([AX_CC_BUILTIN_CHOOSE_EXPR],
+[
+AC_CACHE_CHECK([for __builtin_choose_expr support in compiler], [ax_cv_cc_builtin_choose_expr],[
+  AC_COMPILE_IFELSE(
+    [
+      AC_LANG_SOURCE(
+      [
+        int main(int argc, char **argv) {
+          if ((argc < 0) || !argv) return 1; /* -Werror=unused-parameter */
+          return __builtin_choose_expr(0, 1, 0);
+        }
+      ])
+    ],
+    [ax_cv_cc_builtin_choose_expr=yes],
+    [ax_cv_cc_builtin_choose_expr=no]
+  )
+])
+if test "x$ax_cv_cc_builtin_choose_expr" = "xyes"; then
+  AC_DEFINE([HAVE_BUILTIN_CHOOSE_EXPR],1,[Define if the compiler supports __builtin_choose_expr])
+fi
+])
+
+dnl #
+dnl #  Check if we have the types compatible p builtin
+dnl #
+AC_DEFUN([AX_CC_BUILTIN_TYPES_COMPATIBLE_P],
+[
+AC_CACHE_CHECK([for __builtin_types_compatible_p support in compiler], [ax_cv_cc_builtin_types_compatible_p],[
+  AC_COMPILE_IFELSE(
+    [
+      AC_LANG_SOURCE(
+      [
+        int main(int argc, char **argv) {
+          if ((argc < 0) || !argv) return 1; /* -Werror=unused-parameter */
+          return !(__builtin_types_compatible_p(char *, char *));
+        }
+      ])
+    ],
+    [ax_cv_cc_builtin_types_compatible_p=yes],
+    [ax_cv_cc_builtin_types_compatible_p=no]
+  )
+])
+if test "x$ax_cv_cc_builtin_types_compatible_p" = "xyes"; then
+  AC_DEFINE([HAVE_BUILTIN_TYPES_COMPATIBLE_P],1,[Define if the compiler supports __builtin_types_compatible_p])
+fi
+])
+
+dnl #
+dnl #  Check if we have the bwsap64 builtin
+dnl #
+AC_DEFUN([AX_CC_BUILTIN_BSWAP64],
+[
+AC_CACHE_CHECK([for __builtin_bswap64 support in compiler], [ax_cv_cc_builtin_bswap64],[
+  AC_COMPILE_IFELSE(
+    [
+      AC_LANG_SOURCE([
+        int main(int argc, char **argv) {
+          if ((argc < 0) || !argv) return 1; /* -Werror=unused-parameter */
+          return (__builtin_bswap64(0));
+        }
+      ])
+    ],
+    [ax_cv_cc_builtin_bswap64=yes],
+    [ax_cv_cc_builtin_bswap64=no]
+  )
+])
+if test "x$ax_cv_cc_builtin_bswap64" = "xyes"; then
+  AC_DEFINE([HAVE_BUILTIN_BSWAP64],1,[Define if the compiler supports __builtin_bswap64])
+fi
+])
+
+dnl #
+dnl #  Check if we have the clzll builtin
+dnl #
+AC_DEFUN([AX_CC_BUILTIN_CLZLL],
+[
+AC_CACHE_CHECK([for __builtin_clzll support in compiler], [ax_cv_cc_builtin_clzll],[
+  AC_COMPILE_IFELSE(
+    [
+      AC_LANG_SOURCE([
+        int main(int argc, char **argv) {
+          if ((argc < 0) || !argv) return 1; /* -Werror=unused-parameter */
+          return (__builtin_clzll(0) - (sizeof(unsigned long long) * 8));
+        }
+      ])
+    ],
+    [ax_cv_cc_builtin_clzll=yes],
+    [ax_cv_cc_builtin_clzll=no]
+  )
+])
+if test "x$ax_cv_cc_builtin_clzll" = "xyes"; then
+  AC_DEFINE([HAVE_BUILTIN_CLZLL],1,[Define if the compiler supports __builtin_clzll])
+fi
+])
+
+dnl #
+dnl #  Check if size_t and int64_t are identical
+dnl #
+AC_DEFUN([AX_CC_SIZE_SAME_AS_UINT64],
+[
+AC_CACHE_CHECK([if size_t == uint64_t], [ax_cv_cc_size_same_as_uint64],[
+  AC_COMPILE_IFELSE(
+    [
+      AC_LANG_SOURCE([
+        #include <stdint.h>
+        #include <stddef.h>
+
+        int main(int argc, char **argv) {
+          return _Generic((size_t)(0), uint64_t: 1, size_t: 0);
+        }
+      ])
+    ],
+    [ax_cv_cc_size_same_as_uint64=no],
+    [ax_cv_cc_size_same_as_uint64=yes]
+  )
+])
+if test "x$ax_cv_cc_size_same_as_uint64" = "xyes"; then
+  AC_DEFINE([SIZE_SAME_AS_UINT64],1,[Define if the compiler supports size_t has the same underlying type as uint64])
+fi
+])
+
+dnl #
+dnl #  Check if ssize_t and int64_t are identical
+dnl #
+AC_DEFUN([AX_CC_SSIZE_SAME_AS_INT64],
+[
+AC_CACHE_CHECK([if ssize_t == int64_t], [ax_cv_cc_ssize_same_as_int64],[
+  AC_COMPILE_IFELSE(
+    [
+      AC_LANG_SOURCE([
+        #include <stdint.h>
+        #include <stddef.h>
+        #include <sys/types.h>
+
+        int main(int argc, char **argv) {
+          return _Generic((ssize_t)(0), int64_t: 1, ssize_t: 0);
+        }
+      ])
+    ],
+    [ax_cv_cc_ssize_same_as_int64=no],
+    [ax_cv_cc_ssize_same_as_int64=yes]
+  )
+])
+if test "x$ax_cv_cc_ssize_same_as_int64" = "xyes"; then
+  AC_DEFINE([SSIZE_SAME_AS_INT64],1,[Define if the compiler supports ssize_t has the same underlying type as int64])
+fi
+])
+
+dnl #
+dnl # Determine the number of system cores we have
+dnl #
+AC_DEFUN([AX_SYSTEM_CORES],[
+  AC_CACHE_CHECK([number of system cores], [ax_cv_system_cores],
+    [
+      AC_LANG_PUSH(C)
+      AC_TRY_RUN(
+        [
+          #include <stdio.h>
+          #include <stdint.h>
+          #ifdef _WIN32
+          #  include <windows.h>
+          #elif MACOS
+          #  include <sys/param.h>
+          #  include <sys/sysctl.h>
+          #else
+          #  include <unistd.h>
+          #endif
+
+          int main (int argc, char *argv[])
+          {
+            uint32_t count;
+
+            #ifdef WIN32
+            SYSTEM_INFO sysinfo;
+            GetSystemInfo(&sysinfo);
+
+            count = sysinfo.dwNumberOfProcessors;
+
+            #elif MACOS
+            int nm[2];
+            size_t len = 4;
+
+            nm[0] = CTL_HW;
+            nm[1] = HW_AVAILCPU;
+            sysctl(nm, 2, &count, &len, NULL, 0);
+
+            if(count < 1) {
+              nm[1] = HW_NCPU;
+              sysctl(nm, 2, &count, &len, NULL, 0);
+              if(count < 1) {
+                count = 1;
+              }
+            }
+
+            #else
+      	    count = sysconf(_SC_NPROCESSORS_ONLN);
+            #endif
+
+            return count;
+          }
+        ],
+        [ax_cv_system_cores=$?],
+        [ax_cv_system_cores=$?],
+        [ax_cv_system_cores=]
+    )
+    AC_LANG_POP
+  ])
+])
+

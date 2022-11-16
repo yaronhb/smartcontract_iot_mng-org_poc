@@ -1,0 +1,50 @@
+[vars]
+employee_id         = ${ENV::vars_EMPLOYEE_ID}
+employee_id_4digs   = ${ENV::vars_EMPLOYEE_ID_4DIGS}
+domain              = ${ENV::vars_DOMAIN}
+password            = ${ENV::vars_PASSWORD}
+
+[ ca ]
+default_ca		= CA_default
+
+[ CA_default ]
+dir			    = ./
+certs			= $dir
+database		= $dir/out/$vars::employee_id/index.txt
+new_certs_dir	= $dir
+certificate		= $dir/out/$vars::employee_id/ca_$vars::employee_id_4digs.pem
+serial			= $dir/out/$vars::employee_id/serial_no
+private_key		= $dir/out/$vars::employee_id/ca_$vars::employee_id_4digs.key
+RANDFILE		= $dir/.rand
+name_opt		= ca_default
+cert_opt		= ca_default
+default_days	= 7
+default_md		= sha256
+preserve		= no
+policy			= policy_match
+
+[ policy_match ]
+commonName		= supplied
+emailAddress	= match
+UID             = match
+
+[ req ]
+prompt			    = no
+distinguished_name	= user_certificate_authority
+default_bits		= 2048
+input_password		= $vars::password
+output_password		= $vars::password
+x509_extensions		= v3_ca
+
+[user_certificate_authority]
+UID		        = ${vars::employee_id}
+emailAddress	= $UID@${vars::domain}
+commonName		= CA
+
+
+
+[v3_ca]
+subjectKeyIdentifier	= hash
+authorityKeyIdentifier	= keyid:always,issuer:always
+basicConstraints	= critical,CA:true
+

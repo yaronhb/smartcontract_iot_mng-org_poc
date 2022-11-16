@@ -1,0 +1,22 @@
+# PRE: if
+
+&Tmp-Integer-0 := 0
+
+group {
+	&Tmp-Integer-0 += 1
+
+	noop
+	actions {
+		noop = retry
+
+		retry {
+			max_rtx_count = 3
+		}
+	}
+}
+
+if (&Tmp-Integer-0 != 3) {
+	test_fail
+}
+
+success

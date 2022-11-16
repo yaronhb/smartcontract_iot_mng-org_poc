@@ -1,0 +1,21 @@
+#
+#  PRE: subrequest
+#
+&control.Tmp-String-0 := "Access-Request"
+
+#
+#  Subrequest with an attribute reference
+#
+subrequest &control.Tmp-String-0 {
+	&parent.control.User-Name := 'bob'
+
+	success
+}
+
+if (!&control.User-Name) {
+	test_fail
+}
+
+if (&control.User-Name != 'bob') {
+	test_fail
+}

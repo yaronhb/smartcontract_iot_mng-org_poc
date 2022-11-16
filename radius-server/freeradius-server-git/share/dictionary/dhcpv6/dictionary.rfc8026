@@ -1,0 +1,19 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC 8026 - Unified IPv4-in-IPv6 Softwire Customer Premises Equipment (CPE):
+#	      A Based Prioritization Mechanism
+#
+#  $Id$
+#
+##############################################################################
+
+ATTRIBUTE	S46-Priority				111	uint16 array
+VALUE	S46-Priority			DS-Lite			64
+VALUE	S46-Priority			DHCPv4-Over-DHCPv6	88
+VALUE	S46-Priority			MAP-E			94
+VALUE	S46-Priority			MAP-T			95
+VALUE	S46-Priority			Lightweight-4-Over-6	96

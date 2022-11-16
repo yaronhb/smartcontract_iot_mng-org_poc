@@ -1,0 +1,63 @@
+# PRE: redundant redundant-load-balance
+#
+#  Nested redundant blocks.
+#
+#
+&request += {
+	&Tmp-Integer-2 = 0
+	&Tmp-Integer-3 = 0
+	&Tmp-Integer-4 = 0
+	&Tmp-Integer-5 = 0
+}
+
+redundant {
+	redundant-load-balance {
+		group {
+			&Tmp-Integer-2 += 1
+			fail
+		}
+		group {
+			&Tmp-Integer-3 += 1
+			fail
+		}
+		group {
+			&Tmp-Integer-4 += 1
+			fail
+		}
+		group {
+			&Tmp-Integer-5 += 1
+			fail
+		}
+	}
+
+	#
+	#  All of the above fails, so we fail over to "ok".
+	#
+	ok
+}
+
+if (!ok) {
+	test_fail
+	return
+}
+
+if (&Tmp-Integer-2 != 1) {
+	test_fail
+}
+
+if (&Tmp-Integer-3 != 1) {
+	test_fail
+	return
+}
+
+if (&Tmp-Integer-4 != 1) {
+	test_fail
+	return
+}
+
+if (&Tmp-Integer-5 != 1) {
+	test_fail
+	return
+}
+
+success

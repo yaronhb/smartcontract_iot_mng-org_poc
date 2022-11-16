@@ -1,0 +1,48 @@
+#
+# PRE: concat
+#
+#  Check explode works correctly
+#
+&request += {
+	&Class = '1=1|my_attr=2|my_attr=hello|'
+	&Calling-Station-ID = '|'
+}
+
+&control += {
+	&User-Name = '|hello|goodbye'
+	&User-Name = '|morning|night|1|'
+	&Reply-Message = 'Can\'t touch this'
+	&Tmp-String-0 = 'here.  are . some.  words. '
+}
+
+&request += {
+	&Tmp-String-1 = "%(concat:%(explode:%{Class} |) ,)"
+	&Tmp-String-2 = "%(concat:%(explode:%{Calling-Station-ID} |) ,)"
+	&Tmp-String-3 = "%(concat:%(explode:%{control.User-Name[*]} |) ,)"
+	&Tmp-String-4 = "%(concat:%(explode:%{control.Reply-Message} |) ,)"
+	&Tmp-String-5 = "%(concat:%(explode:%{control.Tmp-String-0} '. ') ,)"
+}
+
+debug_all
+
+if ("%{Tmp-String-1}" != "1=1,my_attr=2,my_attr=hello") {
+	test_fail
+}
+
+if ("%{Tmp-String-2}" != "") {
+	test_fail
+}
+
+if ("%{Tmp-String-3}" != "hello,goodbye,morning,night,1") {
+	test_fail
+}
+
+if ("%{Tmp-String-4}" != 'Can\'t touch this') {
+	test_fail
+}
+
+if ("%{Tmp-String-5}" != 'here, are ,some, words') {
+	test_fail
+}
+
+success

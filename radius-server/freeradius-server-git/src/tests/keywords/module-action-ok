@@ -1,0 +1,9 @@
+#
+# PRE: ok-return
+#
+
+ok {
+	ok = 1
+}
+
+success

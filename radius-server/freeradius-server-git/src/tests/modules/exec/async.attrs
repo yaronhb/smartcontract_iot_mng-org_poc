@@ -1,0 +1,11 @@
+#
+#  Input packet
+#
+Packet-Type = Access-Request
+User-Name = "fivel"
+User-Password = "mousekewitz"
+
+#
+#  Expected answer
+#
+Packet-Type == Access-Accept

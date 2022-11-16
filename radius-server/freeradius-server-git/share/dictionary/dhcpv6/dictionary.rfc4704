@@ -1,0 +1,19 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC 4704 - The Dynamic Host Configuration Protocol for IPv6 (DHCPv6) Client
+#             Fully Qualified Domain Name (FQDN) Option
+#
+#  $Id$
+#
+##############################################################################
+
+ATTRIBUTE	Client-FQDN				39	struct
+MEMBER		Reserved				bit[5]
+MEMBER		No-Server-Update			bit[1]
+MEMBER		Server-Override				bit[1]
+MEMBER		Server-Update				bit[1]
+MEMBER		Domain-Name				string		partial_dns_label

@@ -1,0 +1,45 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+	remove)
+		;;
+	purge)
+		# Remove dangling links from sites-enabled.
+		for link in /etc/freeradius/sites-enabled/*; do
+			if [ -L "$link" ] && [ ! -e "$link" ]; then
+				rm -f "$link"
+			fi
+		done
+
+		# Remove dangling links from mods-enabled.
+		for link in /etc/freeradius/mods-enabled/*; do
+			if [ -L "$link" ] && [ ! -e "$link" ]; then
+				rm -f "$link"
+			fi
+		done
+
+		for file in /etc/freeradius/certs/rsa/server.pem \
+		  /etc/freeradius/certs/rsa/server.key \
+		  /etc/freeradius/certs/ecc/server.pem \
+		  /etc/freeradius/certs/ecc/server.key \
+		  /etc/freeradius/dictionary \
+		  /etc/freeradius/radiusd.conf \
+		  /etc/freeradius
+		do
+			if dpkg-statoverride --list | grep -qw $file$; then
+				dpkg-statoverride --remove $file
+			fi
+		done
+
+		test -d /etc/freeradius && rmdir --ignore-fail-on-non-empty /etc/freeradius
+		;;
+	*)
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0
+

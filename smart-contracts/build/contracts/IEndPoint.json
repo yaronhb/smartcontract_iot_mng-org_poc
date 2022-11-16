@@ -1,0 +1,296 @@
+{
+  "contractName": "IEndPoint",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "endpoint_id",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "endpoint_id",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "employee_id",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "validity_length",
+              "type": "uint64"
+            },
+            {
+              "internalType": "string",
+              "name": "data",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct Ticket",
+          "name": "ticket",
+          "type": "tuple"
+        }
+      ],
+      "name": "validate_ticket",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"endpoint_id\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"endpoint_id\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"employee_id\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"validity_length\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"data\",\"type\":\"string\"}],\"internalType\":\"struct Ticket\",\"name\":\"ticket\",\"type\":\"tuple\"}],\"name\":\"validate_ticket\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/IEndPoint.sol\":\"IEndPoint\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/IEndPoint.sol\":{\"keccak256\":\"0x2fca08f4f23b83f41b0afeb213ef4d0d03eee48a28afd116e01bfc7dcfd0558a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c111ab5fe50ca5b443687fa32499d40217270accae27d5f8b1cf48425bafae14\",\"dweb:/ipfs/QmVMPfuR5WqKuJ1XFLTxnQtTJSzaoTXHAYd24ZdirHVTHj\"]},\"project:/contracts/Ticket.sol\":{\"keccak256\":\"0xbdacee57df4712f20a1e8023260fcc91f593cc7250809df4b45c9dce0a00531c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8668114544a157f39a328b3e29e0bf8a7a460080f50fa4ae190d0a476462e0cb\",\"dweb:/ipfs/QmeQJeiKyudg1fYZ4Apf42GKW71PW2rMSnKQReZh1BQWfC\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity >= 0.8.13;\n\nimport \"./Ticket.sol\";\n\ninterface IEndPoint {\n    function endpoint_id() external view returns (bytes32);\n    \n    function validate_ticket(Ticket memory ticket) external view returns (bool);\n}",
+  "sourcePath": "/Users/mi/Dropbox (Technion Dropbox)/main/courses/M.Sc. Technion Courses/236332:3 - IoT -  Technologies and Implementations & Project in IoT/Project/contracts/contracts/IEndPoint.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/IEndPoint.sol",
+    "exportedSymbols": {
+      "IEndPoint": [
+        620
+      ],
+      "Ticket": [
+        766
+      ]
+    },
+    "id": 621,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 605,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".13"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:26:5"
+      },
+      {
+        "absolutePath": "project:/contracts/Ticket.sol",
+        "file": "./Ticket.sol",
+        "id": 606,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 621,
+        "sourceUnit": 767,
+        "src": "60:22:5",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IEndPoint",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 620,
+        "linearizedBaseContracts": [
+          620
+        ],
+        "name": "IEndPoint",
+        "nameLocation": "94:9:5",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "59d9bbca",
+            "id": 611,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "endpoint_id",
+            "nameLocation": "119:11:5",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 607,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "130:2:5"
+            },
+            "returnParameters": {
+              "id": 610,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 609,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 611,
+                  "src": "156:7:5",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 608,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "156:7:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "155:9:5"
+            },
+            "scope": 620,
+            "src": "110:55:5",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "d8441d2a",
+            "id": 619,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "validate_ticket",
+            "nameLocation": "184:15:5",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 615,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 614,
+                  "mutability": "mutable",
+                  "name": "ticket",
+                  "nameLocation": "214:6:5",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 619,
+                  "src": "200:20:5",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                    "typeString": "struct Ticket"
+                  },
+                  "typeName": {
+                    "id": 613,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 612,
+                      "name": "Ticket",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 766,
+                      "src": "200:6:5"
+                    },
+                    "referencedDeclaration": 766,
+                    "src": "200:6:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Ticket_$766_storage_ptr",
+                      "typeString": "struct Ticket"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "199:22:5"
+            },
+            "returnParameters": {
+              "id": 618,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 617,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 619,
+                  "src": "245:4:5",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 616,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "245:4:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "244:6:5"
+            },
+            "scope": 620,
+            "src": "175:76:5",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 621,
+        "src": "84:169:5",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:221:5"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.13+commit.abaa5c0e.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.9",
+  "updatedAt": "2022-11-13T18:39:02.814Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

@@ -1,0 +1,169 @@
+= The update Statement
+
+The `update` statement is deprecated.  It may work, but it will be
+removed in a future release.  The `update` statement does not support
+the data types of `group` and `struct`.
+
+All new configuration should use the new xref:unlang/edit.adoc[edit]
+syntax.  It is more flexible and more powerful than `update` sections.
+
+This page exists only document how the old-style `update` sections can
+be converted to the new syntax.
+
+The most important conceptual change is that the
+xref:unlang/edit.adoc[edit] syntax separates list assignments from
+value assignments.  Where the `update` sections always modified a list
+by adding or deleting attributes, the new syntax allows for list
+updates _or_ updates to an attributes value.  Be careful not to get
+the two uses mixed up, otherwise the result will not be what you
+expect.
+
+The second conceptual change is that attribute creation is separate
+from applying attributes to a list.  For example, the `+=` operator
+used to both create an attribute, and then append that attribute to a
+list.  The new edit syntax separates attribute creation from list
+modification.
+
+== Conversions
+
+There are a larger number of operators using for both the old `update`
+section and the xref:unlang/edit.adoc[edit] syntax.  We explain in
+detail how the configuration can be converted from one form to another.
+
+=== Appending to a list: +=
+
+The following example creates four attributes, and appends them to the
+`request` list.
+
+[source,unlang]
+----
+update request {
+	&User-Name += "foo"
+	&Filter-Id += "bar"
+	&NAS-IP-Address += 127.0.0.1
+	&NAS-Port += 5
+}
+----
+
+This example should be converted to the following syntax:
+
+[source,unlang]
+----
+&request += {
+	&User-Name = "foo"
+	&Filter-Id = "bar"
+	&NAS-IP-Address = 127.0.0.1
+	&NAS-Por = 5
+}
+----
+
+This configuration can be interpreted as "edit the `&request` list,
+but appending (`+=`) another list to it.  The list being appended
+contains four attributes".
+
+Note that the operators on the right-hand side list are all `=`.  The
+`=` operator is used here because we are simply _creating_ the
+right-hand side list, not _modifying_ it.
+
+=== Over-writing attributes in a list: :=
+
+The following example over-writes the values for two attributes in the
+`request` list.
+
+[source,unlang]
+----
+update request {
+	&User-Name := "foo"
+	&Filter-Id := "bar"
+}
+----
+
+The simplest conversion here is to keep the `:=` operator, and to just
+assign the attributes in place, with a list qualifier.
+
+[source,unlang]
+----
+&request.User-Name := "foo"
+&request.Filter-Id := "bar"
+----
+
+=== Conditionally Over-writing attributes in a list: =
+
+The following example conditionally over-writes the values for two attributes in the
+`request` list.
+
+[source,unlang]
+----
+update request {
+	&User-Name = "foo"
+	&Filter-Id = "bar"
+}
+----
+
+The simplest conversion here is to keep the `=` operator, and to just
+assign the attributes in place, with a list qualifier.
+
+[source,unlang]
+----
+&request.User-Name = "foo"
+&request.Filter-Id = "bar"
+----
+
+=== Removing Attributes from a list: !*
+
+The following example removes all `&User-Name` attributes from the `request` list.
+
+[source,unlang]
+----
+update request {
+	&User-Name !* ANY
+}
+----
+
+The conversion is to use the `-=` operator:
+
+[source,unlang]
+----
+&request -= &User-Name
+----
+
+== More Complex Conversions
+
+It is extremely difficult to document every possible conversion when
+using a mix of operators in an `update` section.  The above examples
+should be sufficient for most common cases.
+
+Our recommendation is that if an `update` section contains multiple
+different operators, it should be split into multiple assignments.
+That is, do not try to convert the entire `update` section as-is.
+Instead, separate the `update` section into multiple `update`
+sections, one for each operator.  Then, convert each `update` section
+individually.
+
+Another option is to write down in plain English what operations you
+wish to perform.  Then, look at the new documentation to see how those
+operations match to the new syntax.
+
+In most cases, the operations are little more than "add attributes to
+list", or "delete attributes from list".  Those operations are simple
+to perform in the new syntax.
+
+== Issues with the Old Operators
+
+The operators in the `update` sections were really _list_ operators,
+and not _value_ operators.  For example, `+=` was "add attribute to
+list", and not "add value to attribute".  This mixup was the source of
+a significant amount of confusion when people first tried to use
+FreeRADIUS.
+
+In addition, using `+=` to manipulate lists meant that it was
+impossible to use that operator for adding values.  The follow-on
+effect was that math had to be done using the `%{expr:...}` expansion,
+which was confusing and difficult to document.  Changing the syntax
+allowed the separation of list assignments from value modifications,
+which meant that xref:unlang/expression.adoc[expressions] became
+became simpler.
+
+
+// Copyright (C) 2021 Network RADIUS SAS.  Licenced under CC-by-NC 4.0.
+// Development of this documentation was sponsored by Network RADIUS SAS.

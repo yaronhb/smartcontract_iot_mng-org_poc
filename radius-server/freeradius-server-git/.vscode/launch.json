@@ -1,0 +1,129 @@
+{
+        // Use IntelliSense to learn about possible attributes.
+        // Hover to view descriptions of existing attributes.
+        // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+        "version": "0.2.0",
+        "configurations": [
+                {
+                        "type": "lldb",
+                        "request": "launch",
+                        "name": "Debug (lldb)",
+                        "program": "${workspaceFolder}/build/bin/local/radiusd",
+                        "args": [
+                                "-X",
+                                "-D",
+                                "${workspaceFolder}/share/dictionary",
+                                "-d",
+                                "${workspaceFolder}/raddb"
+                        ],
+                        "cwd": "${workspaceFolder}",
+                        "env": {
+                                "FR_LIBRARY_PATH": "${workspaceFolder}/build/lib/local/.libs",
+                                "DEBUGGER_ATTACHED": "yes"
+                        }
+                },
+                {
+                        "type": "cppdbg",
+                        "request": "launch",
+                        "name": "Debug (gdb)",
+                        "program": "${workspaceFolder}/build/bin/local/radiusd",
+                        "args": [
+                                "-X",
+                                "-D",
+                                "${workspaceFolder}/share/dictionary",
+                                "-d",
+                                "${workspaceFolder}/raddb"
+                        ],
+                        "cwd": "${workspaceFolder}",
+                        "environment": [
+                                { "name": "FR_LIBRARY_PATH", "value": "${workspaceFolder}/build/lib/local/.libs" },
+                                { "name": "DEBUGGER_ATTACHED", "value": "yes" }
+                        ],
+                        "MIMode": "gdb"
+                },
+                {
+                        "type": "cppdbg",
+                        "request": "launch",
+                        "name": "Keyword Test (gdb)",
+                        "program": "${workspaceFolder}/build/bin/local/unit_test_module",
+                        "args": [
+                                "-D",
+                                "${workspaceFolder}/share/dictionary",
+                                "-d",
+                                "${workspaceFolder}/src/tests/keywords",
+                                "-i",
+                                "${workspaceFolder}/build/tests/keywords/${input:keyword}.attrs",
+                                "-f",
+                                "${workspaceFolder}/build/tests/keywords/${input:keyword}.attrs",
+                                "-r",
+                                "${workspaceFolder}/build/tests/keywords/${input:keyword}",
+                                "-xx"
+                        ],
+                        "cwd": "${workspaceFolder}",
+                        "environment": [
+                                { "name": "FR_LIBRARY_PATH", "value": "${workspaceFolder}/build/lib/local/.libs" },
+                                { "name": "LD_LIBRARY_PATH", "value": "${workspaceFolder}/build/lib/local/.libs" },
+                                { "name": "KEYWORD", "value": "${input:keyword}" },
+                                { "name": "DEBUGGER_ATTACHED", "value": "yes"}
+                        ],
+                        "MIMode": "gdb"
+                },
+                {
+                        "type": "cppdbg",
+                        "request": "launch",
+                        "name": "Bin Test (gdb)",
+                        "program": "${workspaceFolder}/build/bin/local/${input:bintest}",
+                        "cwd": "${workspaceFolder}",
+                        "environment": [
+                                {"name": "FR_LIBRARY_PATH", "value": "${workspaceFolder}/build/lib/local/.libs" },
+                                {"name": "LD_LIBRARY_PATH", "value": "${workspaceFolder}/build/lib/local/.libs" }
+                        ]
+                },
+                {
+                        "type": "cppdbg",
+                        "request": "launch",
+                        "name": "Module Test (gdb)",
+                        "program": "${workspaceFolder}/build/bin/local/unit_test_module",
+                        "cwd": "${workspaceFolder}",
+                        "args": [
+                                "-D",
+                                "share/dictionary",
+                                "-d",
+                                "src/tests/modules/",
+                                "-i",
+                                "build/tests/modules/${input:module}/${input:moduletest}.attrs",
+                                "-f",
+                                "build/tests/modules/${input:module}/${input:moduletest}.attrs",
+                                "-xx"
+                        ],
+                        "environment": [
+                                { "name": "FR_LIBRARY_PATH", "value": "${workspaceFolder}/build/lib/local/.libs" },
+                                { "name": "LD_LIBRARY_PATH", "value": "${workspaceFolder}/build/lib/local/.libs" },
+                                { "name": "MODULE_TEST_DIR", "value": "src/tests/modules/${input:module}/"},
+                                { "name": "MODULE_TEST_UNLANG", "value": "src/tests/modules/${input:module}/${input:moduletest}.unlang" }
+                        ],
+                }
+        ],
+        "inputs": [
+                {
+                        "id": "keyword",
+                        "type": "promptString",
+                        "description": "Keyword to test"
+                },
+                {
+                        "id": "bintest",
+                        "type": "promptString",
+                        "description": "Bin test to run"
+                },
+                {
+                        "id": "module",
+                        "type": "promptString",
+                        "description": "Module to test"
+                },
+                {
+                        "id": "moduletest",
+                        "type": "promptString",
+                        "description": "Test to run"
+                }
+        ]
+}

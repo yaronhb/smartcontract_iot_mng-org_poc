@@ -1,0 +1,176 @@
+#
+#  Calculate various thingies.
+#
+
+######################################################################
+#
+#  integers
+#
+calc uint8 255 + uint8 255 -> uint8
+match Invalid cast from uint64 to uint8.  510 outside value range 0-255
+
+calc uint8 127 + uint8 127 -> uint8
+match 254
+
+#
+#  Wildly varying types get intermediate values upcast to the "best"
+#  type which is likely to handle the result.  The final result is
+#  then cast to the output type.
+#
+calc int8 -1 + uint8 14 -> int16
+match 13
+
+calc int32 -1 + uint8 14 -> int16
+match 13
+
+calc int32 11 % uint8 2 -> int16
+match 1
+
+calc int8 0x7f & uint8 0x40 -> uint8
+match 64
+
+calc uint8 5 - uint8 16 -> uint8
+match Value underflows 'uint8' when calculating result.
+
+calc uint32 5 - uint32 16 -> uint32
+match Value underflows 'uint32' when calculating result.
+
+#
+#  Intermediate values are too large for destination, but the
+#  resulting value can fit.
+#
+calc uint32 1000 - uint32 999 -> uint8
+match 1
+
+# this can be cast
+calc string "1" < uint32 2 -> bool
+match yes
+
+# this can't
+calc string "stuff" < uint32 2 -> bool
+match Failed parsing string as type 'uint32'
+
+######################################################################
+#
+#  strings
+#
+# string append
+calc string "a" . string "b" -> string
+match ab
+
+# string subtraction is the inverse of addition!
+calc string "ab" - string "b" -> string
+match a
+
+######################################################################
+#
+#  octets
+#
+# octets append
+calc octets "a" . octets "b" -> octets
+match 0x6162
+
+# octets subtraction is the inverse of addition!
+calc octets "ab" - octets "b" -> octets
+match 0x61
+
+calc octets "a" & octets "b" -> octets
+match 0x60
+
+calc octets "a" | octets "b" -> octets
+match 0x63
+
+# octets xor
+calc octets "a" ^ octets "b" -> octets
+match 0x03
+
+# we can "fake out" structs by just appending stuff
+calc ipaddr 127.0.0.1 . ipaddr 127.0.0.2 -> octets
+match 0x7f0000017f000002
+
+######################################################################
+#
+#  times and dates
+#
+# time deltas
+calc time_delta 1 + time_delta 2 -> time_delta
+match 3
+
+# dates can be subtracted, but not added.
+calc date "Jan 11 1970 00:00:00 UTC" - date "Jan 1 1970 00:00:00 UTC" -> time_delta
+match 864000
+
+#  One day earlier
+calc date "Jan 11 1970 00:00:00 UTC" -  time_delta 86400 -> date
+match Jan 10 1970 00:00:00 UTC
+
+calc date "Jan 11 1970 00:00:00 UTC" -  time_delta 1d -> date
+match Jan 10 1970 00:00:00 UTC
+
+#
+#  Comparisons don't need output data types
+#
+calc date "Jan 11 1970 00:00:00 UTC" < date "Jan 1 1970 00:00:00 UTC"
+match no
+
+######################################################################
+#
+#  ip addresses and prefixes
+#
+
+#
+# make an IP out of a prefix and an offset
+#
+calc ipv4prefix 127/8 + uint8 1 -> ipaddr
+match 127.0.0.1
+
+calc ipv4addr 192.168.2.1 & uint32 0xffff0000 -> ipv4prefix
+match 192.168.0.0/16
+
+#  unknown destination type results in an IPv4 prefix for this operation.
+calc ipv4addr 192.168.2.1 & uint32 0xffff0000 -> null
+match 192.168.0.0/16
+
+calc ipv4addr 192.168.2.1 & uint32 0xffff0080 -> ipv4prefix
+match Invalid network mask '0xffff0080'
+
+calc ipv6addr 2001:DB8::1 & octets 0xffff0000000000000000000000000000
+match 2001::/16
+
+calc ipv6addr 2001:DB8::1 & octets 0xffffff00000000000000000000000000
+match 2001:d00::/24
+
+calc ipv6addr 2001:DB8::1 & octets 0xffffffff000000000000000000000000
+match 2001:db8::/32
+
+######################################################################
+#
+#  Float
+#
+calc float32 1.0 + float32 2.5 -> float32
+match 3.500000
+
+calc float32 1.0 * float32 2.5 -> float32
+match 2.500000
+
+calc float32 11.0 % float32 2.0 -> float32
+match 1.000000
+
+calc float32 11.0 % float32 0.0 -> float32
+match Cannot divide by zero.
+
+######################################################################
+#
+#  Assignment operations
+#
+calc uint8 1 := uint8 2
+match 2
+
+calc uint8 1 += uint8 3
+match 4
+
+calc string "2" += string "test"
+match 2test
+
+count
+match 76

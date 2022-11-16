@@ -1,0 +1,6 @@
+TARGETNAME	:= rlm_linelog
+
+TARGET		:= $(TARGETNAME)$(L)
+SOURCES		:= $(TARGETNAME).c
+
+LOG_ID_LIB	= 27

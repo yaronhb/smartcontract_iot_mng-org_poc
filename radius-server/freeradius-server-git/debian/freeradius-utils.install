@@ -1,0 +1,9 @@
+usr/bin/smbencrypt
+usr/bin/radclient
+usr/bin/radwho
+usr/bin/radsniff
+usr/bin/radlast
+usr/bin/radtest
+usr/bin/radzap
+usr/bin/radsqlrelay
+usr/bin/radcrypt

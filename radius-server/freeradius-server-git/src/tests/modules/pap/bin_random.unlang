@@ -1,0 +1,12 @@
+if (&User-Name == 'test') {
+	&User-Password := "%{randstr:bbbbbbbbbbbbbbbb}"
+	&control.Password.Cleartext := "%{User-Password}"
+
+	pap.authorize
+	pap.authenticate
+	if (!ok) {
+		test_fail
+	} else {
+		test_pass
+	}
+}

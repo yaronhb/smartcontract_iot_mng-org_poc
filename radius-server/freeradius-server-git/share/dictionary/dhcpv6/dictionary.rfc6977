@@ -1,0 +1,13 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC 6977 - Triggering DHCPv6 Reconfiguration from Relay Agents
+#
+#  $Id$
+#
+##############################################################################
+
+ATTRIBUTE	Link-Address				80	ipv6addr

@@ -1,0 +1,19 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#	Actelis dictionary
+#
+#	$Id$
+#
+##############################################################################
+
+VENDOR		Actelis				5468
+
+BEGIN-VENDOR	Actelis
+
+ATTRIBUTE	Privilege				1	string
+
+END-VENDOR	Actelis

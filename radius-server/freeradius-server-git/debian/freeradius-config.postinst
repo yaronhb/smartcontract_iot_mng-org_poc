@@ -1,0 +1,65 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+  configure)
+        if [ -z "$2" ]; then
+          if ! dpkg-statoverride --list | grep -qw /etc/freeradius$; then
+            dpkg-statoverride --add --update freerad freerad 2751 /etc/freeradius
+          fi
+
+          if ! dpkg-statoverride --list | grep -qw /etc/freeradius/radiusd.conf$; then
+            dpkg-statoverride --add --update root freerad 0640 /etc/freeradius/radiusd.conf
+          fi
+
+          # Relax permissions on local dictionary - allows radclient to run and should
+          # not contain secrets.  At any rate, only do it on fresh install
+          if ! dpkg-statoverride --list | grep -qw /etc/freeradius/dictionary$; then
+            dpkg-statoverride --add --update root freerad 0644 /etc/freeradius/dictionary
+          fi
+
+          # Create snakeoil certificates on initial install
+          make -C /etc/freeradius/certs/
+
+          for file in /etc/freeradius/certs/rsa/server.pem \
+            /etc/freeradius/certs/rsa/server.key \
+            /etc/freeradius/certs/ecc/server.pem \
+            /etc/freeradius/certs/ecc/server.key
+	  do
+            if ! dpkg-statoverride --list | grep -qw $file$; then
+              dpkg-statoverride --add --update root freerad 0640 $file
+            fi
+	  done
+
+          # Create links for default modules
+          for mod in always attr_filter cache_eap chap client \
+              delay detail detail.log dhcpv4 digest eap \
+              eap_inner echo exec files linelog logintime \
+              mschap ntlm_auth pap pam passwd radutmp \
+              soh sradutmp stats unix unpack utf8 ; do
+            if test ! -h /etc/freeradius/mods-enabled/$mod && \
+               test ! -e /etc/freeradius/mods-enabled/$mod; then
+              ln -s ../mods-available/$mod /etc/freeradius/mods-enabled/$mod
+            fi
+          done
+        fi
+
+        # Create links for default sites, but only if this is an initial
+        # install or an upgrade from before there were links; users may
+        # want to remove them...
+        if [ -z "$2" ] || dpkg --compare-versions "$2" lt 2.0.4+dfsg-4; then
+          for site in default inner-tunnel; do
+            if test ! -h /etc/freeradius/sites-enabled/$site && \
+               test ! -e /etc/freeradius/sites-enabled/$site; then
+              ln -s ../sites-available/$site /etc/freeradius/sites-enabled/$site
+            fi
+          done
+        fi
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
+

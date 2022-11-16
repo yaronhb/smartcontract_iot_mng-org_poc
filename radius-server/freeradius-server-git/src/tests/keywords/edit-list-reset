@@ -1,0 +1,23 @@
+#
+# PRE: edit-list
+#
+
+&control.Tmp-String-0 := "foo"
+
+#  must exist
+if (!&control.Tmp-String-0) {
+	test_fail
+}
+
+#
+#  Reset the list to empty contents
+#
+&control := {}
+
+#  must not exist
+if (&control.Tmp-String-0) {
+	test_fail
+}
+
+
+success

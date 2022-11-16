@@ -1,0 +1,20 @@
+subrequest Access-Request {
+	&parent.request.Tmp-String-0 := "testing1234"
+
+	return
+
+	#
+	#  Should be ignored
+	#
+	&parent.request.Tmp-String-1 := "testing1234"
+}
+
+if (&Tmp-String-1) {
+	test_fail
+}
+
+if (&Tmp-String-0 != "testing1234") {
+	test_fail
+}
+
+success

@@ -1,0 +1,22 @@
+#
+#  PRE: foreach foreach-break
+#
+
+&Tmp-String-0 := "ABCDEF_8"
+
+#
+#  This creates a bunch of Tmp-String-0 attributes.
+#
+&control.Tmp-String-0 := { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g" }
+
+foreach &control.Tmp-String-0 {
+	if ("%{Tmp-String-0[*]}" =~ /([A-Z0-9\-]*)_%{Foreach-Variable-0}/) {
+		&Tmp-String-0 := "%{1}"
+		success
+		break
+	}
+	elsif ("%{Foreach-Variable-0}" == '9') {
+		test_fail
+		reject
+	}
+}

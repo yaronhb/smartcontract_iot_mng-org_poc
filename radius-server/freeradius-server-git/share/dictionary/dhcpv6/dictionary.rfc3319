@@ -1,0 +1,15 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC3319 - Dynamic Host Configuration Protocol (DHCPv6) Options
+#            for Session Initiation Protocol (SIP) Servers
+#
+#  $Id$
+#
+##############################################################################
+
+ATTRIBUTE	SIP-Server-Domain-Name-List		21	string dns_label,array
+ATTRIBUTE	SIP-Server-Address			22	ipv6addr array

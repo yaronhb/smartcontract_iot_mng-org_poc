@@ -1,0 +1,3 @@
+foreach "%{expr:1 + 2}" {	# ERROR
+	&reply.Called-Station-Id += "%{Foreach-Variable-0}"
+}

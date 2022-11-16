@@ -1,0 +1,178 @@
+#pragma once
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+ */
+#ifdef WITH_TLS
+/**
+ * $Id$
+ *
+ * @file lib/tls/tls.h
+ * @brief Structures and prototypes for TLS wrappers
+ *
+ * @copyright 2010 Network RADIUS SARL (legal@networkradius.com)
+ * @copyright 2016 The FreeRADIUS project
+ */
+RCSIDH(tls_h, "$Id$")
+
+#include "openssl_user_macros.h"
+
+#include <freeradius-devel/server/cf_parse.h>
+#include <freeradius-devel/server/tmpl.h>
+#include <freeradius-devel/unlang/function.h>
+
+#undef HAVE_OPENSSL_OCSP_H
+
+#ifdef HAVE_OPENSSL_ENGINE_H
+#  include <openssl/engine.h>
+#endif
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
+#include "cache.h"
+#include "conf.h"
+#include "index.h"
+#include "session.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern int fr_tls_ex_index_vps;
+extern int fr_tls_max_threads;
+
+/** Drain log messages from an OpenSSL bio and print them using the specified logging macro
+ *
+ * @param _macro Logging macro e.g. RDEBUG.
+ * @param _prefix Prefix, should be "" if not used.
+ * @param _queue OpenSSL BIO.
+ */
+#define FR_OPENSSL_DRAIN_LOG_QUEUE(_macro, _prefix, _queue) \
+do {\
+	char const *_p = NULL, *_q, *_end; \
+	size_t _len; \
+	_len = BIO_get_mem_data(_queue, &_p); \
+	_end = _p + _len; \
+	if (!_p) break; \
+	while ((_q = memchr(_p, '\n', _end - _p))) { \
+		_macro(_prefix "%.*s", (int) (_q - _p), _p); \
+		_p = _q + 1; \
+	} \
+	if (_p != _end) _macro(_prefix "%.*s", (int) (_end - _p), _p); \
+	(void) BIO_reset(_queue); \
+} while (0)
+
+/** Drain errors from an OpenSSL bio and print print them using the specified logging macro
+ *
+ * @param _macro Logging macro e.g. RDEBUG.
+ * @param _prefix Prefix, should be "" if not used.
+ * @param _queue OpenSSL BIO.
+ */
+#define FR_OPENSSL_DRAIN_ERROR_QUEUE(_macro, _prefix, _queue) \
+do {\
+	ERR_print_errors(_queue); \
+	FR_OPENSSL_DRAIN_LOG_QUEUE(_macro, _prefix, _queue); \
+} while (0)
+
+extern CONF_PARSER fr_tls_server_config[];
+extern CONF_PARSER fr_tls_client_config[];
+
+/** Holds the temporary context
+ *
+ */
+extern _Thread_local TALLOC_CTX *ssl_talloc_ctx;
+
+/** Bind any memory allocated by an OpenSSL function to the object it created
+ *
+ * This is a horrible workaround for OpenSSL memory leaks.  But should always
+ * work, unless OpenSSL allocates memory for global structures whilst allocating
+ * non-global ones.
+ *
+ * It is technically threadsafe as ssl_talloc_ctx is thread specific.
+ *
+ * This should always work so long as OpenSSL does not become talloc aware and
+ * so will free the allocated object last, after doing manual cleanups.
+ *
+ @code{.c}
+   FR_OPENSSL_BIND_MEMORY(ctx = SSL_CTX_new(SSLv23_method()));
+   if (!ctx) ..error
+ @endcode
+ * @param _expr		The call to the OpenSSL function and storage of the
+ *			result.
+ */
+#define FR_OPENSSL_BIND_OBJ_MEMORY(_expr) \
+do { \
+	void *_nmem; \
+	MEM(ssl_talloc_ctx = talloc_init_const(STRINGIFY(_expr))); \
+	_nmem = (_expr);\
+	if (!_nmem) { \
+		TALLOC_FREE(ssl_talloc_ctx); \
+	} else { \
+		talloc_steal(_nmem, ssl_talloc_ctx); \
+	} \
+	ssl_talloc_ctx = NULL; \
+} while (0)
+
+/** Bind all memory allocated from this point until the next instance of FR_OPENSSL_BIND_MEMORY_END to _obj
+ *
+ * @param[in] _obj	to bind memory to.
+ */
+#define FR_OPENSSL_BIND_MEMORY_BEGIN(_obj) \
+do { \
+	if (fr_cond_assert(!ssl_talloc_ctx && (_obj))) { \
+		MEM(ssl_talloc_ctx = talloc_init_const(STRINGIFY(_obj))); \
+		talloc_steal(_obj, ssl_talloc_ctx); \
+	} \
+} while(0)
+
+#define FR_OPENSSL_BIND_MEMORY_END ssl_talloc_ctx = NULL
+
+/*
+ *	tls/ctx.c
+ */
+
+/** Return the tls config associated with a SSL_CTX
+ *
+ * @param[in] ssl_ctx	to retrieve the configuration from.
+ * @return #fr_tls_conf_t associated with the ctx.
+ */
+static inline fr_tls_conf_t *fr_tls_ctx_conf(SSL_CTX *ssl_ctx)
+{
+	return talloc_get_type_abort(SSL_CTX_get_ex_data(ssl_ctx, FR_TLS_EX_INDEX_CONF), fr_tls_conf_t);
+}
+
+SSL_CTX		*fr_tls_ctx_alloc(fr_tls_conf_t const *conf, bool client);
+
+/*
+ *	tls/base.c
+ */
+int		fr_openssl_thread_init(size_t async_pool_size_init, size_t async_pool_size_max);
+
+int		fr_openssl_init(void);
+
+int		fr_openssl_fips_mode(bool enabled);
+
+void		fr_openssl_free(void);
+
+int		fr_tls_dict_init(void);
+
+/*
+ *	tls/virtual_server.c
+ */
+unlang_action_t fr_tls_call_push(request_t *child, unlang_function_t resume,
+			       	 fr_tls_conf_t *conf, fr_tls_session_t *tls_session);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* WITH_TLS */

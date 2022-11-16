@@ -1,0 +1,23 @@
+#
+#  Sync calls should always return a zero length string
+#  because we don't wait for the response.
+#
+&Tmp-String-0 := `/bin/sh -c 'echo hello'`
+if (&Tmp-String-0 != 'hello') {
+	test_fail
+} else {
+	test_pass
+}
+
+#
+#  Test default list override
+#
+#update request {
+#	control: += `/bin/sh -c "echo reply.Reply-Message = \'hello\'"`
+#}
+
+#if (&reply.Reply-Message != 'hello') {
+#	test_fail
+#} else {
+#	test_pass
+#}

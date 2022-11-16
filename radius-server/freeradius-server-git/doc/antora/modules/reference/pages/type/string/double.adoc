@@ -1,0 +1,144 @@
+= Double Quoted Strings
+
+.Syntax
+`"string"`
+
+A double-quoted string allows escape sequences and
+xref:xlat/index.adoc[dynamic expansions]. As with
+xref:type/string/single.adoc[single-quoted strings], text within
+double quotes can include spaces.
+
+The main difference between the single and double quoted strings is
+that the double quoted strings can be dynamically expanded. The syntax
+`${...}` is used for parse-time expansion and `%{...}` is used for
+run-time expansion. The difference between the two methods is that the
+`${...}` form is expanded when the server loads the configuration
+files and is valid anywhere in the configuration files. The `%{...}`
+xref:xlat/index.adoc[dynamic expansion] form is valid only in conditional
+expressions and attribute assignments.
+
+The output of the dynamic expansion can be interpreted as a string,
+a number, or an IP address, depending on its context.
+
+Note that the interpretation of text _strongly_ depends on the
+context.  The text `"0000"` can be interpreted as a data type
+"integer", having value zero, or a data type "string", having value
+`"0000"`.  In general when a particular piece of text is used, it is
+used with the context of a known attribute.  That attribute has a
+xref:type/index.adoc[data type], and the text will be interpreted as that
+data type.
+
+NOTE: Most values retrieved from external datastores will be treated implicitly
+as double-quoted strings.
+
+== Escape sequences
+
+Escape sequences allow the inclusion of characters that may be difficult to
+represent in datastores, or the FreeRADIUS configuration files.
+
+.Escape sequences and their descriptions
+[options="header", cols="15%,85%"]
+|=====
+| Escape sequence     | Character represented
+| `\\`                | Literal backslash (0x5c)
+| `\r`                | Carriage return (0x0d)
+| `\n`                | Line feed (0x0a)
+| `\t`                | Horizontal tab (0x09)
+| `\"`                | Double quote (0x22)
+| `\x<hex><hex>`      | A byte whose numerical value is given by `<hex><hex>` interpreted as a hexadecimal number.
+| `\x<oct><oct><oct>` | A byte whose numerical value is given by `<oct><oct><oct>` interpreted as an octal number.
+|=====
+
+== Methods of Creating Strings
+
+There are a few different ways in which double-quoted strings can be
+created.  The simplest is just an in-line string, as in `"string"`.
+However, strings can also be created via
+xref:unlang/expression.adoc[expressions]. and
+xref:xlat/index.adoc[dynamic expansions].
+
+In general, creating strings via xref:xlat/index.adoc[dynamic
+expansions] will result in the _printed_ version of the expansion
+being used.
+
+.Example of double-quoted string expansion
+[source,unlang]
+----
+"User-Name is %{User-Name}"
+"IP Address is %{reply.Framed-IP-Address}
+----
+
+Both of the above expansions will return the _printed_ version of the
+expansion.  For `User-Name`, it will be the string version of the
+users name, as would be expected.  However, for the
+`Framed-IP-Address` example, the printed version will be an ASCII
+string such as `192.0.2.1`, even though the actual IP address is a
+32-bit number.
+
+When a string is created via an
+xref:unlang/expression.adoc[expression] using the `+` operator, the
+resulting string can be quite different, depending on the inputs.
+
+.Example of casting to 'string'
+[source,unlang]
+----
+"User-Name is " + &User-Name
+"IP Address is " + (string) &reply.Framed-IP-Address
+----
+
+The output strings here (with casting) are the same as for the
+previous example.  Note that we do not have to cast `&User-Name`,
+because it is already a string.
+
+.Example of casting to 'octets'
+[source,unlang]
+----
+"User-Name is " + (octets) &User-Name
+"IP Address is " + (octets) &reply.Framed-IP-Address
+----
+
+The output strings here are completely different than for the previous
+examples.  The output data type is `octets`, and not `string`.
+
+If the goal is to have the _raw_ `octets` data inserted into a
+`string`, you must use the `%{string:...}` expansion.  This expansion
+will copy the input `octets` value to a the output, changing the data
+type to `string`.  The value is left alone.
+
+.Example of casting to raw 'octets'
+[source,unlang]
+----
+"User-Name is %{Tmp-Octets-0}"
+"User-Name is %{string:%{Tmp-Octets-0}}"
+----
+
+if the `&Tmp-Octets-0` attribute has value `0x666f6f` (`foo`)
+
+In the first expansion, the resulting output is `User-Name is
+0x666f6f`.  In the second expansion, the resulting output is
+`User-name is foo`.
+
+Note that placing raw `octets` data into a string may allow for binary
+data to be inserted into what should be a printable string.  Any uses
+of the string will result in the non-printable data being escaped as
+`\000` or other methods such a `\n`, depending on how and wheere the
+string is being used.
+
+.Examples
+
+`"word"` +
+`"a string"' +
+`"foo\"bar\""` +
+`"this is a long string"` +
+`"this has embedded\ncharacters"` +
+`"attribute\tvalue\nusername\t%{User-Name}\nreply-message\t%{reply.Reply-Message}"`
+`"The result of 'SELECT * FROM foo WHERE 1' is: %{sql:SELECT * FROM foo WHERE 1}"`
+
+// Licenced under CC-by-NC 4.0.
+// Copyright (C) 2019 Arran Cudbard-Bell <a.cudbardb@freeradius.org>
+// Copyright (C) 2019 The FreeRADIUS project.
+// Copyright (C) 2021 Network RADIUS SAS.
+
+
+
+

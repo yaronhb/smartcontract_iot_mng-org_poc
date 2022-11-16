@@ -1,0 +1,13 @@
+switch &User-Name {
+	case "bob" {
+		success
+	}
+
+	case "doug" {
+		&Filter-Id := "doug"
+	}
+
+	default {
+		&Filter-Id := "default"
+	}
+}

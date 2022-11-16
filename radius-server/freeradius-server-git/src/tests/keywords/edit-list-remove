@@ -1,0 +1,105 @@
+#
+# PRE: edit-list
+#
+
+&request += {
+	&Tmp-Octets-0 = 0x00
+	&Tmp-String-0 = "foo"
+	&Tmp-Integer-0 = 1
+}
+
+#  Does exist
+if (!&Tmp-String-0) {
+	test_fail
+}
+
+# Remove the first one
+&request -= &Tmp-String-0
+
+#  Does not exist
+if (&Tmp-String-0) {
+	test_fail
+}
+
+# Other things still exist
+if (!&Tmp-Octets-0) {
+	test_fail
+}
+
+if (!&Tmp-Integer-0) {
+	test_fail
+}
+
+#
+#  Add multiple of the same type
+#
+&request += {
+	&Tmp-String-0 = "foo"
+	&Tmp-String-0 = "bar"
+	&Tmp-String-0 = "baz"
+}
+
+if (!&Tmp-String-0) {
+	test_fail
+}
+
+&request -= &Tmp-String-0[0]
+
+#  the first one has been removed
+if (&Tmp-String-0[0] != "bar") {
+	test_fail
+}
+
+# Other things still exist
+if (!&Tmp-Octets-0) {
+	test_fail
+}
+
+if (!&Tmp-Integer-0) {
+	test_fail
+}
+
+&request -= &Tmp-String-0[*]
+
+# Does not exist
+if (&Tmp-String-0) {
+	test_fail
+}
+
+&Tmp-String-0 := { "foo", "bar", "baz" }
+
+#
+#  Remove one by value.
+#
+#  @todo - allow for == or =~ in the RHS list,
+#  as a condition?  For now, it's an exact match. :(
+#
+&request -= {
+	&Tmp-String-0 == "bar"
+}
+
+if (&Tmp-String-0[0] != "foo") {
+	test_fail
+}
+
+if (&Tmp-String-0[1] != "baz") {
+	test_fail
+}
+
+if (&Tmp-String-0[2]) {
+	test_fail
+}
+
+#
+#  Remove via in-place list, too.
+#
+&request -= "Tmp-String-0 == 'foo'"
+if (&Tmp-String-0[0] != "baz") {
+	test_fail
+}
+
+if (&Tmp-String-0[1]) {
+	test_fail
+}
+
+success

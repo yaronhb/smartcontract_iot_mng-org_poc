@@ -1,0 +1,23 @@
+imap_try_tls.authenticate
+
+# if (&cert-attrs.Issuer) {
+#        test_fail
+#}
+# else {
+#        test_pass
+#}
+
+
+if (ok) {
+    &control.Auth-Type := Accept
+}
+else {
+    reject
+}
+
+if (&TLS-Certificate.Issuer =~ /@example\.org/) {
+        test_pass
+} else {
+	test_fail
+}
+

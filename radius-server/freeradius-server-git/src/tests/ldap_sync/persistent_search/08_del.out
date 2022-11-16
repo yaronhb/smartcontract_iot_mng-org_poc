@@ -1,0 +1,2 @@
+Delete ou=groups,dc=example,dc=com cn=baz,ou=groups,dc=example,dc=com  
+Group member uid=bill,ou=people,dc=example,dc=com

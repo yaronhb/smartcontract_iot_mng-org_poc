@@ -1,0 +1,173 @@
+= Casts
+
+Values can be *cast* from one data type to another.  However, this
+cast only changes the _type_ of the data, it does not change the datas
+_value_.  That is, a cast allows you to convert an `octets` data type
+to a `string`, but the resulting `string` may still contain
+non-printable characters.
+
+Casting is used when the server is unable to automatically figure out
+the correct data type to use.  For example, in the following
+expansion, it is not immediately obvious that the right side of the
+expression is an IP address.  It could instead be interpreted as a string
+`"192.0.2.1"`.
+
+[source,unlang]
+----
+if ("%{sql:SELECT ipaddress FROM table WHERE user=%{User-Name}}" == 192.0.2.1) }
+    ....
+}
+----
+
+Since there is no attribute reference on either side of the `==`
+operator, the interpreter has no way of knowing that the string
+`192.0.2.1` is an IP address.  There is unfortunately no way of
+_always_ parsing strings in order to automatically determine which
+data type to use.  Any such automatic parsing would work most of the
+time, but it would have error cases where the parsing was incorrect.
+
+The solution is to resolve these ambiguities by allowing the values to
+be cast to a particular type.  Casting a value to a type tells the
+interpreter how that value should be parsed.  Casting is done by
+prefixing a value with the type name, surrounded by brackets;
+`(...)`.
+
+.Syntax
+----
+(...)value
+----
+
+We can add a cast to the above example, as follows:
+
+.Example
+[source,unlang]
+----
+if ("%{sql:SELECT ipaddress FROM table WHERE user=%{User-Name}}" == (ipaddr)192.0.2.1) }
+    ....
+}
+----
+
+In this example, we prefix the IP address with the string `(ipaddr)`.
+The interpreter then knows that the value `192.0.2.` should be
+interpreted as the data type `ipaddr`, and not as the literal string
+`"192.0.2."`.
+
+For a full list of data types which can be used in a cast, please see
+the xref:type/all_types.adoc[list of data types] page, and the
+"Basic Type Types" section.
+
+In most cases, the server can automatically determine what data type
+to use.  The cast syntax is used when either the data type is
+ambiguous, or when data should be normalized prior to comparison, or
+when a specific data type is required.
+
+== Casting Behavior
+
+In general, casting data types of different sizes will fail.  For
+example, casting an `octet` string of length `3` to `uint32` is
+impossible, because `uint32` data types are 4 bytes in length.
+
+However, in many cases casting from one data type will "just work".
+
+When the cast fails, the result is a `NULL` or empty value.
+
+=== IP Addresses
+
+Casting `ipv4addr` to `ipv6addr` will return an IPv6 address which
+contains the IPv4 address, with the upper bits as `::ffff`.  This
+result is then a valid "IPv4-mapped IPv6 address".
+
+Casting `ipv6addr` to `ipv4addr` will work if the IPv6 address is a
+valid "IPv4-mapped IPv6 address".
+
+Similar rules apply to casting between IPv4 and IPv6 prefixes.
+
+Casting an IPv4 address to an IPv4 prefix is allowed, and will return
+a prefix of using a `/32`.  Casting the other way is also allowed, but
+only if the prefix is `/32`.
+
+=== Numbers
+
+Numbers can generally be cast from one data type to another, if the
+input value can be represented in the new data type.
+
+For example, casting `uint8` to `uint16` will always succeed.
+However, casting a signed `int8` to `uint16` may fail, as negative
+values cannot be represented in the `uint16` data type.
+
+=== Octets
+
+Casting any data type to `octets` means returning the "raw" value of
+the underlying data type.  For example, casting an IPv4 address of
+value `127.0.0.1` to `octets` will return the `octets` string
+`0x7f000001`.
+
+Casting an `octets` value to any other data type means interpreting
+the raw value as that data type, generally as if the data had been
+received from the network.  For example, casting the `octets` string
+`0x7f000001` to `ipvaddr` will return the IPv4 address `127.0.0.1`.
+
+=== Strings
+
+Casting any data type to `string` means _printing_ the data type to a
+string, and assigning the resulting value to the `string`.  For a
+value of typ e `octets`, this means that the output is a hex string,
+prefixed with `0x`.  In order to get the "raw" hex values of an
+`octets` data type, the `%{hex:...}` expansion is used.  It prints out
+the hex value of its input, without the leading `0x` characters.
+
+Casting a `string` value to another data type means _parsing_ the
+string as that data type.
+
+See xref:types/string/double.adoc[double-quoted strings] for examples
+of how double-quoted strings are used.
+
+=== Other Data Types
+
+Other data types such as `ethernet`, etc. can generally be cast
+to/from `octet`, and printed to/from `string`.  Most other casts do
+not make sense, and will not work.
+
+== Expressions
+
+Unlang xref:unlang/expression.adoc[expressions] can use casts, too, as
+in the following example:
+
+.Example Casting numbers to a 'string'
+[source,unlang]
+----
+(string)(5 + 6)
+----
+
+The output of this cast will be the string value `"11"`.
+
+Casting expressions can also be used to "force" specific data types.
+For example, if we want to get the network byte-order value of a
+16-bit integer, we can do the following:
+
+.Example Casting numbers to a fixed-size network byte order
+[source,unlang]
+----
+(octets)((uint16) 258)
+----
+
+The output of this cast will be an `octet` string having value
+`0x0103`.  This kind of casting can be used to create and pack "ad
+hoc" data structures for sending in a packet:
+
+.Example Ad-hoc network structures
+[source,unlang]
+----
+(octets)((uint16) 258) + (octets)((uint16) 4) + (octets)((ipv4addr) 127.0.0.1)
+----
+
+will result in the `octet` string value `0x010300047f000001`.
+
+== Compatibility
+
+For compatibility with version 3, the `<cast>` syntax is also
+supported.  We recommend, however, that people use the new syntax.
+The old syntax will eventually be removed, and will create an error.
+
+// Copyright (C) 2021 Network RADIUS SAS.  Licenced under CC-by-NC 4.0.
+// Development of this documentation was sponsored by Network RADIUS SAS.

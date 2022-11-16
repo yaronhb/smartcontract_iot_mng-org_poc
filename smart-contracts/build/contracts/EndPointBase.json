@@ -1,0 +1,1620 @@
+{
+  "contractName": "EndPointBase",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "endpoint_id",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "endpoint_id",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "employee_id",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "validity_length",
+              "type": "uint64"
+            },
+            {
+              "internalType": "string",
+              "name": "data",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct Ticket",
+          "name": "ticket",
+          "type": "tuple"
+        }
+      ],
+      "name": "validate_ticket",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"endpoint_id\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"endpoint_id\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"employee_id\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"validity_length\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"data\",\"type\":\"string\"}],\"internalType\":\"struct Ticket\",\"name\":\"ticket\",\"type\":\"tuple\"}],\"name\":\"validate_ticket\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/EndPointBase.sol\":\"EndPointBase\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/EndPointBase.sol\":{\"keccak256\":\"0xf59e20295c3d9da4d04b124c3b7b1b2e322c633abb3a9a1f5006131dcd627b8a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://59b80c295c1509427b574dc3d6030d67c05e2f7ad58aae57bb684028fef6478d\",\"dweb:/ipfs/QmXME4xzHgNZHpUYS65mMkvhb4GpWYtqdEhYmF6EyoJ6aK\"]},\"project:/contracts/IEndPoint.sol\":{\"keccak256\":\"0x2fca08f4f23b83f41b0afeb213ef4d0d03eee48a28afd116e01bfc7dcfd0558a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c111ab5fe50ca5b443687fa32499d40217270accae27d5f8b1cf48425bafae14\",\"dweb:/ipfs/QmVMPfuR5WqKuJ1XFLTxnQtTJSzaoTXHAYd24ZdirHVTHj\"]},\"project:/contracts/Ticket.sol\":{\"keccak256\":\"0xbdacee57df4712f20a1e8023260fcc91f593cc7250809df4b45c9dce0a00531c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8668114544a157f39a328b3e29e0bf8a7a460080f50fa4ae190d0a476462e0cb\",\"dweb:/ipfs/QmeQJeiKyudg1fYZ4Apf42GKW71PW2rMSnKQReZh1BQWfC\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity >= 0.8.13;\n\nimport \"./IEndPoint.sol\";\n\n// solregex --name CertRegex '-----BEGIN CERTIFICATE-----[ \\n]*[A-Za-z0-9\\+/]+[ \\n]*-----END CERTIFICATE-----[ \\n]*' > CertRegex.sol\n//import \"./CertRegex.sol\";\n\nabstract contract EndPointBase is IEndPoint {\n\n    //uint256 public lastTicket;\n\n    constructor(bytes32 endpoint_id_) {\n        _endpoint_id = endpoint_id_;\n        //lastTicket = 0;\n    }\n\n    bytes32 _endpoint_id;\n    function endpoint_id() public view override returns (bytes32) { return _endpoint_id; }\n\n    function validate_ticket(Ticket memory ticket) public view override returns (bool) {\n        if (ticket.endpoint_id != endpoint_id()) {\n            return false;\n        }\n        return validate_ticket_extra(ticket);\n    }\n\n    function validate_ticket_extra(Ticket memory ticket) internal view virtual returns (bool);\n}\n\nabstract contract EndPointCertData is EndPointBase {\n\n    uint64 public validity_length;\n\n    constructor(uint64 _validity_length) {\n        validity_length = _validity_length;\n    }\n\n    function validate_ticket_extra(Ticket memory ticket) internal view override returns (bool) {\n        if (ticket.validity_length != validity_length) {\n            return false;\n        }\n        // string memory cert = ticket.data;\n        // return CertRegex.matches(cert);\n        return true;\n    }\n}\n\nabstract contract EndPointEncryptedSecretData is EndPointBase {\n\n    uint64 public validity_length;\n    string public publicKey; \n\n    constructor(uint64 _validity_length, string memory _publicKey) {\n        validity_length = _validity_length;\n        publicKey = _publicKey;\n    }\n\n    function validate_ticket_extra(Ticket memory ticket) internal view override returns (bool) {\n        if (ticket.validity_length != validity_length) {\n            return false;\n        }\n        // string memory cert = ticket.data;\n        // return CertRegex.matches(cert);\n        return true;\n    }\n}\n\n",
+  "sourcePath": "/Users/mi/Dropbox (Technion Dropbox)/main/courses/M.Sc. Technion Courses/236332:3 - IoT -  Technologies and Implementations & Project in IoT/Project/contracts/contracts/EndPointBase.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/EndPointBase.sol",
+    "exportedSymbols": {
+      "EndPointBase": [
+        462
+      ],
+      "EndPointCertData": [
+        497
+      ],
+      "EndPointEncryptedSecretData": [
+        540
+      ],
+      "IEndPoint": [
+        620
+      ],
+      "Ticket": [
+        766
+      ]
+    },
+    "id": 541,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 406,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".13"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:26:2"
+      },
+      {
+        "absolutePath": "project:/contracts/IEndPoint.sol",
+        "file": "./IEndPoint.sol",
+        "id": 407,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 541,
+        "sourceUnit": 621,
+        "src": "60:25:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 408,
+              "name": "IEndPoint",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 620,
+              "src": "283:9:2"
+            },
+            "id": 409,
+            "nodeType": "InheritanceSpecifier",
+            "src": "283:9:2"
+          }
+        ],
+        "canonicalName": "EndPointBase",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": false,
+        "id": 462,
+        "linearizedBaseContracts": [
+          462,
+          620
+        ],
+        "name": "EndPointBase",
+        "nameLocation": "267:12:2",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 418,
+              "nodeType": "Block",
+              "src": "368:70:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 416,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 414,
+                      "name": "_endpoint_id",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 421,
+                      "src": "378:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 415,
+                      "name": "endpoint_id_",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 411,
+                      "src": "393:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "378:27:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 417,
+                  "nodeType": "ExpressionStatement",
+                  "src": "378:27:2"
+                }
+              ]
+            },
+            "id": 419,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 412,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 411,
+                  "mutability": "mutable",
+                  "name": "endpoint_id_",
+                  "nameLocation": "354:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 419,
+                  "src": "346:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 410,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "346:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "345:22:2"
+            },
+            "returnParameters": {
+              "id": 413,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "368:0:2"
+            },
+            "scope": 462,
+            "src": "334:104:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 421,
+            "mutability": "mutable",
+            "name": "_endpoint_id",
+            "nameLocation": "452:12:2",
+            "nodeType": "VariableDeclaration",
+            "scope": 462,
+            "src": "444:20:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 420,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "444:7:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              611
+            ],
+            "body": {
+              "id": 429,
+              "nodeType": "Block",
+              "src": "532:24:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 427,
+                    "name": "_endpoint_id",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 421,
+                    "src": "541:12:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 426,
+                  "id": 428,
+                  "nodeType": "Return",
+                  "src": "534:19:2"
+                }
+              ]
+            },
+            "functionSelector": "59d9bbca",
+            "id": 430,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "endpoint_id",
+            "nameLocation": "479:11:2",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 423,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "505:8:2"
+            },
+            "parameters": {
+              "id": 422,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "490:2:2"
+            },
+            "returnParameters": {
+              "id": 426,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 425,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 430,
+                  "src": "523:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 424,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "523:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "522:9:2"
+            },
+            "scope": 462,
+            "src": "470:86:2",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              619
+            ],
+            "body": {
+              "id": 452,
+              "nodeType": "Block",
+              "src": "645:140:2",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    },
+                    "id": 443,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 439,
+                        "name": "ticket",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 433,
+                        "src": "659:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                          "typeString": "struct Ticket memory"
+                        }
+                      },
+                      "id": 440,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "endpoint_id",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 759,
+                      "src": "659:18:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 441,
+                        "name": "endpoint_id",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 430,
+                        "src": "681:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_view$__$returns$_t_bytes32_$",
+                          "typeString": "function () view returns (bytes32)"
+                        }
+                      },
+                      "id": 442,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "681:13:2",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "659:35:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 447,
+                  "nodeType": "IfStatement",
+                  "src": "655:78:2",
+                  "trueBody": {
+                    "id": 446,
+                    "nodeType": "Block",
+                    "src": "696:37:2",
+                    "statements": [
+                      {
+                        "expression": {
+                          "hexValue": "66616c7365",
+                          "id": 444,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "bool",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "717:5:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          },
+                          "value": "false"
+                        },
+                        "functionReturnParameters": 438,
+                        "id": 445,
+                        "nodeType": "Return",
+                        "src": "710:12:2"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 449,
+                        "name": "ticket",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 433,
+                        "src": "771:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                          "typeString": "struct Ticket memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                          "typeString": "struct Ticket memory"
+                        }
+                      ],
+                      "id": 448,
+                      "name": "validate_ticket_extra",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 461,
+                      "src": "749:21:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$_t_struct$_Ticket_$766_memory_ptr_$returns$_t_bool_$",
+                        "typeString": "function (struct Ticket memory) view returns (bool)"
+                      }
+                    },
+                    "id": 450,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "749:29:2",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 438,
+                  "id": 451,
+                  "nodeType": "Return",
+                  "src": "742:36:2"
+                }
+              ]
+            },
+            "functionSelector": "d8441d2a",
+            "id": 453,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "validate_ticket",
+            "nameLocation": "571:15:2",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 435,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "621:8:2"
+            },
+            "parameters": {
+              "id": 434,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 433,
+                  "mutability": "mutable",
+                  "name": "ticket",
+                  "nameLocation": "601:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 453,
+                  "src": "587:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                    "typeString": "struct Ticket"
+                  },
+                  "typeName": {
+                    "id": 432,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 431,
+                      "name": "Ticket",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 766,
+                      "src": "587:6:2"
+                    },
+                    "referencedDeclaration": 766,
+                    "src": "587:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Ticket_$766_storage_ptr",
+                      "typeString": "struct Ticket"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "586:22:2"
+            },
+            "returnParameters": {
+              "id": 438,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 437,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 453,
+                  "src": "639:4:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 436,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "639:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "638:6:2"
+            },
+            "scope": 462,
+            "src": "562:223:2",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "id": 461,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "validate_ticket_extra",
+            "nameLocation": "800:21:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 457,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 456,
+                  "mutability": "mutable",
+                  "name": "ticket",
+                  "nameLocation": "836:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 461,
+                  "src": "822:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                    "typeString": "struct Ticket"
+                  },
+                  "typeName": {
+                    "id": 455,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 454,
+                      "name": "Ticket",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 766,
+                      "src": "822:6:2"
+                    },
+                    "referencedDeclaration": 766,
+                    "src": "822:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Ticket_$766_storage_ptr",
+                      "typeString": "struct Ticket"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "821:22:2"
+            },
+            "returnParameters": {
+              "id": 460,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 459,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 461,
+                  "src": "875:4:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 458,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "875:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "874:6:2"
+            },
+            "scope": 462,
+            "src": "791:90:2",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 541,
+        "src": "249:634:2",
+        "usedErrors": []
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 463,
+              "name": "EndPointBase",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 462,
+              "src": "923:12:2"
+            },
+            "id": 464,
+            "nodeType": "InheritanceSpecifier",
+            "src": "923:12:2"
+          }
+        ],
+        "canonicalName": "EndPointCertData",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": false,
+        "id": 497,
+        "linearizedBaseContracts": [
+          497,
+          462,
+          620
+        ],
+        "name": "EndPointCertData",
+        "nameLocation": "903:16:2",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "functionSelector": "64a69dd2",
+            "id": 466,
+            "mutability": "mutable",
+            "name": "validity_length",
+            "nameLocation": "957:15:2",
+            "nodeType": "VariableDeclaration",
+            "scope": 497,
+            "src": "943:29:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint64",
+              "typeString": "uint64"
+            },
+            "typeName": {
+              "id": 465,
+              "name": "uint64",
+              "nodeType": "ElementaryTypeName",
+              "src": "943:6:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint64",
+                "typeString": "uint64"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 475,
+              "nodeType": "Block",
+              "src": "1016:51:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 473,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 471,
+                      "name": "validity_length",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 466,
+                      "src": "1026:15:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 472,
+                      "name": "_validity_length",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 468,
+                      "src": "1044:16:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "src": "1026:34:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "id": 474,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1026:34:2"
+                }
+              ]
+            },
+            "id": 476,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 469,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 468,
+                  "mutability": "mutable",
+                  "name": "_validity_length",
+                  "nameLocation": "998:16:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 476,
+                  "src": "991:23:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 467,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "991:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "990:25:2"
+            },
+            "returnParameters": {
+              "id": 470,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1016:0:2"
+            },
+            "scope": 497,
+            "src": "979:88:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              461
+            ],
+            "body": {
+              "id": 495,
+              "nodeType": "Block",
+              "src": "1164:209:2",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    },
+                    "id": 488,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 485,
+                        "name": "ticket",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 479,
+                        "src": "1178:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                          "typeString": "struct Ticket memory"
+                        }
+                      },
+                      "id": 486,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "validity_length",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 763,
+                      "src": "1178:22:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 487,
+                      "name": "validity_length",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 466,
+                      "src": "1204:15:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "src": "1178:41:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 492,
+                  "nodeType": "IfStatement",
+                  "src": "1174:84:2",
+                  "trueBody": {
+                    "id": 491,
+                    "nodeType": "Block",
+                    "src": "1221:37:2",
+                    "statements": [
+                      {
+                        "expression": {
+                          "hexValue": "66616c7365",
+                          "id": 489,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "bool",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1242:5:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          },
+                          "value": "false"
+                        },
+                        "functionReturnParameters": 484,
+                        "id": 490,
+                        "nodeType": "Return",
+                        "src": "1235:12:2"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "hexValue": "74727565",
+                    "id": 493,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1362:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 484,
+                  "id": 494,
+                  "nodeType": "Return",
+                  "src": "1355:11:2"
+                }
+              ]
+            },
+            "id": 496,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "validate_ticket_extra",
+            "nameLocation": "1082:21:2",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 481,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "1140:8:2"
+            },
+            "parameters": {
+              "id": 480,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 479,
+                  "mutability": "mutable",
+                  "name": "ticket",
+                  "nameLocation": "1118:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 496,
+                  "src": "1104:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                    "typeString": "struct Ticket"
+                  },
+                  "typeName": {
+                    "id": 478,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 477,
+                      "name": "Ticket",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 766,
+                      "src": "1104:6:2"
+                    },
+                    "referencedDeclaration": 766,
+                    "src": "1104:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Ticket_$766_storage_ptr",
+                      "typeString": "struct Ticket"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1103:22:2"
+            },
+            "returnParameters": {
+              "id": 484,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 483,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 496,
+                  "src": "1158:4:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 482,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1158:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1157:6:2"
+            },
+            "scope": 497,
+            "src": "1073:300:2",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 541,
+        "src": "885:490:2",
+        "usedErrors": []
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 498,
+              "name": "EndPointBase",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 462,
+              "src": "1426:12:2"
+            },
+            "id": 499,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1426:12:2"
+          }
+        ],
+        "canonicalName": "EndPointEncryptedSecretData",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": false,
+        "id": 540,
+        "linearizedBaseContracts": [
+          540,
+          462,
+          620
+        ],
+        "name": "EndPointEncryptedSecretData",
+        "nameLocation": "1395:27:2",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "functionSelector": "64a69dd2",
+            "id": 501,
+            "mutability": "mutable",
+            "name": "validity_length",
+            "nameLocation": "1460:15:2",
+            "nodeType": "VariableDeclaration",
+            "scope": 540,
+            "src": "1446:29:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint64",
+              "typeString": "uint64"
+            },
+            "typeName": {
+              "id": 500,
+              "name": "uint64",
+              "nodeType": "ElementaryTypeName",
+              "src": "1446:6:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint64",
+                "typeString": "uint64"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "63ffab31",
+            "id": 503,
+            "mutability": "mutable",
+            "name": "publicKey",
+            "nameLocation": "1495:9:2",
+            "nodeType": "VariableDeclaration",
+            "scope": 540,
+            "src": "1481:23:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_storage",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 502,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "1481:6:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 518,
+              "nodeType": "Block",
+              "src": "1575:83:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 512,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 510,
+                      "name": "validity_length",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 501,
+                      "src": "1585:15:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 511,
+                      "name": "_validity_length",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 505,
+                      "src": "1603:16:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "src": "1585:34:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "id": 513,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1585:34:2"
+                },
+                {
+                  "expression": {
+                    "id": 516,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 514,
+                      "name": "publicKey",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 503,
+                      "src": "1629:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_string_storage",
+                        "typeString": "string storage ref"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 515,
+                      "name": "_publicKey",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 507,
+                      "src": "1641:10:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_string_memory_ptr",
+                        "typeString": "string memory"
+                      }
+                    },
+                    "src": "1629:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage",
+                      "typeString": "string storage ref"
+                    }
+                  },
+                  "id": 517,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1629:22:2"
+                }
+              ]
+            },
+            "id": 519,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 508,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 505,
+                  "mutability": "mutable",
+                  "name": "_validity_length",
+                  "nameLocation": "1531:16:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 519,
+                  "src": "1524:23:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 504,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1524:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 507,
+                  "mutability": "mutable",
+                  "name": "_publicKey",
+                  "nameLocation": "1563:10:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 519,
+                  "src": "1549:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 506,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1549:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1523:51:2"
+            },
+            "returnParameters": {
+              "id": 509,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1575:0:2"
+            },
+            "scope": 540,
+            "src": "1512:146:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              461
+            ],
+            "body": {
+              "id": 538,
+              "nodeType": "Block",
+              "src": "1755:209:2",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    },
+                    "id": 531,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 528,
+                        "name": "ticket",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 522,
+                        "src": "1769:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                          "typeString": "struct Ticket memory"
+                        }
+                      },
+                      "id": 529,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "validity_length",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 763,
+                      "src": "1769:22:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 530,
+                      "name": "validity_length",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 501,
+                      "src": "1795:15:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint64",
+                        "typeString": "uint64"
+                      }
+                    },
+                    "src": "1769:41:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 535,
+                  "nodeType": "IfStatement",
+                  "src": "1765:84:2",
+                  "trueBody": {
+                    "id": 534,
+                    "nodeType": "Block",
+                    "src": "1812:37:2",
+                    "statements": [
+                      {
+                        "expression": {
+                          "hexValue": "66616c7365",
+                          "id": 532,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "bool",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1833:5:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          },
+                          "value": "false"
+                        },
+                        "functionReturnParameters": 527,
+                        "id": 533,
+                        "nodeType": "Return",
+                        "src": "1826:12:2"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "hexValue": "74727565",
+                    "id": 536,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1953:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 527,
+                  "id": 537,
+                  "nodeType": "Return",
+                  "src": "1946:11:2"
+                }
+              ]
+            },
+            "id": 539,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "validate_ticket_extra",
+            "nameLocation": "1673:21:2",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 524,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "1731:8:2"
+            },
+            "parameters": {
+              "id": 523,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 522,
+                  "mutability": "mutable",
+                  "name": "ticket",
+                  "nameLocation": "1709:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 539,
+                  "src": "1695:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Ticket_$766_memory_ptr",
+                    "typeString": "struct Ticket"
+                  },
+                  "typeName": {
+                    "id": 521,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 520,
+                      "name": "Ticket",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 766,
+                      "src": "1695:6:2"
+                    },
+                    "referencedDeclaration": 766,
+                    "src": "1695:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Ticket_$766_storage_ptr",
+                      "typeString": "struct Ticket"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1694:22:2"
+            },
+            "returnParameters": {
+              "id": 527,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 526,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 539,
+                  "src": "1749:4:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 525,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1749:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1748:6:2"
+            },
+            "scope": 540,
+            "src": "1664:300:2",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 541,
+        "src": "1377:589:2",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:1936:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.13+commit.abaa5c0e.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.9",
+  "updatedAt": "2022-11-13T18:39:02.812Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

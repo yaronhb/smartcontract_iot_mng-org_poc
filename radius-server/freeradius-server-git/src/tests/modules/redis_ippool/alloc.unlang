@@ -1,0 +1,164 @@
+#
+#  Run the "redis" xlat
+#
+$INCLUDE cluster_reset.inc
+
+&control.IP-Pool.Name := 'test_alloc'
+
+#
+#  Add IP addresses
+#
+&Tmp-String-0 := `./build/bin/local/rlm_redis_ippool_tool -a 192.168.0.1/32 $ENV{REDIS_IPPOOL_TEST_SERVER}:30001 %{control.IP-Pool.Name} 192.168.0.0`
+
+#
+#  Check allocation
+#
+redis_ippool
+if (updated) {
+	test_pass
+} else {
+	test_fail
+}
+
+if (&reply.Framed-IP-Address == 192.168.0.1) {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Check ZSCORE
+#
+&Tmp-Date-0 := "%l"
+
+if ("%{expr:%(redis:ZSCORE "{%{control.IP-Pool.Name}}:pool" %{reply.Framed-IP-Address}) - %(integer:%{Tmp-Date-0})}" > 20) {
+	test_pass
+} else {
+	test_fail
+}
+
+if ("%{expr:%(redis:ZSCORE "{%{control.IP-Pool.Name}}:pool" %{reply.Framed-IP-Address}) - %(integer:%{Tmp-Date-0})}" < 40) {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Verify the IP hash has been set
+#
+if ("%(redis:HGET {%{control.IP-Pool.Name}}:ip:%{reply.Framed-IP-Address} 'device')" == '00:11:22:33:44:55') {
+	test_pass
+} else {
+	test_fail
+}
+
+if ("%(redis:HGET {%{control.IP-Pool.Name}}:ip:%{reply.Framed-IP-Address} gateway)" == '127.0.0.1') {
+	test_pass
+} else {
+	test_fail
+}
+
+if ("%(redis:HGET {%{control.IP-Pool.Name}}:ip:%{reply.Framed-IP-Address} range)" == '192.168.0.0') {
+	test_pass
+} else {
+	test_fail
+}
+
+if (&reply.IP-Pool.Range == '192.168.0.0') {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Verify the lease has been associated with the device
+#
+if (&reply.Framed-IP-Address == "%(redis:GET {%{control.IP-Pool.Name}}:device:%{Calling-Station-ID})") {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Check we got the correct lease time back
+#
+if (&reply.Session-Timeout == 30) {
+	test_pass
+} else {
+	test_fail
+}
+
+&IP-Pool.Range := &reply.IP-Pool.Range
+&Framed-IP-Address := &reply.Framed-IP-Address
+&Session-Timeout := &reply.Session-Timeout # We should get the same lease time
+&reply := {}
+
+#
+#  Add IP addresses
+#
+&Tmp-String-0 := `./build/bin/local/rlm_redis_ippool_tool -a 192.168.1.1/32 $ENV{REDIS_IPPOOL_TEST_SERVER}:30001 %{control.IP-Pool.Name} 192.168.1.0`
+
+#
+#  Check we get the same lease, with the same lease time
+#
+redis_ippool
+if (updated) {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Check the ranges are the same
+#
+if (&IP-Pool.Range == &reply.IP-Pool.Range) {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Check the IP addresses are the same
+#
+if (&Framed-IP-Address == &reply.Framed-IP-Address) {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Check lease time is the same(ish)
+#
+#  The fudge factor is to allow for delays running ippool tool and script interpretation
+#  as we should be allocating the same lesase as before, but its TTL could be slightly lower.
+#
+if ("%{expr:&Session-Timeout - &reply.Session-Timeout}" < 5) {
+	test_pass
+} else {
+	test_fail
+}
+
+&reply := {}
+
+#
+#  Now change the Calling-Station-ID and check we get a different lease
+#
+&Calling-Station-ID := 'another_mac'
+
+redis_ippool
+if (updated) {
+	test_pass
+} else {
+	test_fail
+}
+
+#
+#  Check we got the right lease
+#
+if (&reply.Framed-IP-Address == 192.168.1.1) {
+	test_pass
+} else {
+	test_fail
+}
+
+&reply := {}

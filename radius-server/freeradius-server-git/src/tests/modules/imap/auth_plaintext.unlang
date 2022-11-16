@@ -1,0 +1,7 @@
+imap.authenticate
+if (ok) {
+    &control.Auth-Type := Accept
+}
+else {
+    reject
+}

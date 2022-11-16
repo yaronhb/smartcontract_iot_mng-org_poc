@@ -1,0 +1,44 @@
+#
+# PRE: edit
+#
+
+&control.Tmp-String-0 := "foo"
+
+#  Doesn't exist
+if (&Tmp-String-0) {
+	test_fail
+}
+
+# append
+&request += &control
+
+#  Does exist, and is the last attribute
+if (!&Tmp-String-0[n]) {
+	test_fail
+}
+
+&request -= &Tmp-String-0[*]
+
+#  Doesn't exist
+if (&Tmp-String-0) {
+	test_fail
+}
+
+# prepend
+&request ^= &control
+
+#  Does exist, and is at offset 0
+if (!&Tmp-String-0[0]) {
+	test_fail
+}
+
+&request -= &Tmp-String-0[*]
+&control.Tmp-String-0 := { "a", "b", "c", "d" }
+
+&request += &control.Tmp-String-0[*]
+if (%{request.Tmp-String-0[#]} != 4) {
+	test_fail
+}
+
+
+success

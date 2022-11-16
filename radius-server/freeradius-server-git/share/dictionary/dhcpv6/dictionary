@@ -1,0 +1,73 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  DHCPv6 dictionary.
+#
+#  $Id$
+#
+##############################################################################
+
+PROTOCOL	DHCPv6		3	verify=lib
+BEGIN-PROTOCOL	DHCPv6
+
+$INCLUDE dictionary.freeradius.internal
+$INCLUDE dictionary.rfc3315
+$INCLUDE dictionary.rfc3319
+$INCLUDE dictionary.rfc3633
+$INCLUDE dictionary.rfc3646
+$INCLUDE dictionary.rfc3898
+$INCLUDE dictionary.rfc4075
+$INCLUDE dictionary.rfc4242
+$INCLUDE dictionary.rfc4280
+$INCLUDE dictionary.rfc4580
+$INCLUDE dictionary.rfc4649
+$INCLUDE dictionary.rfc4704
+$INCLUDE dictionary.rfc4776
+$INCLUDE dictionary.rfc4833
+$INCLUDE dictionary.rfc4994
+$INCLUDE dictionary.rfc5007
+$INCLUDE dictionary.rfc5192
+$INCLUDE dictionary.rfc5223
+$INCLUDE dictionary.rfc5417
+$INCLUDE dictionary.rfc5460
+$INCLUDE dictionary.rfc5678
+$INCLUDE dictionary.rfc5908
+$INCLUDE dictionary.rfc5970
+$INCLUDE dictionary.rfc5986
+$INCLUDE dictionary.rfc6011
+$INCLUDE dictionary.rfc6153
+$INCLUDE dictionary.rfc6225
+$INCLUDE dictionary.rfc6334
+$INCLUDE dictionary.rfc6355
+$INCLUDE dictionary.rfc6422
+$INCLUDE dictionary.rfc6440
+$INCLUDE dictionary.rfc6603
+$INCLUDE dictionary.rfc6607
+$INCLUDE dictionary.rfc6610
+$INCLUDE dictionary.rfc6731
+$INCLUDE dictionary.rfc6784
+$INCLUDE dictionary.rfc6939
+$INCLUDE dictionary.rfc6977
+$INCLUDE dictionary.rfc7037
+$INCLUDE dictionary.rfc7078
+$INCLUDE dictionary.rfc7083
+$INCLUDE dictionary.rfc7291
+$INCLUDE dictionary.rfc7341
+$INCLUDE dictionary.rfc7598
+$INCLUDE dictionary.rfc7600
+$INCLUDE dictionary.rfc7653
+$INCLUDE dictionary.rfc7710
+$INCLUDE dictionary.rfc7774
+$INCLUDE dictionary.rfc7839
+$INCLUDE dictionary.rfc8026
+$INCLUDE dictionary.rfc8115
+$INCLUDE dictionary.rfc8156
+
+$INCLUDE dictionary.freeradius
+$INCLUDE dictionary.microsoft
+$INCLUDE dictionary.nokia.sr
+
+END-PROTOCOL 	DHCPv6

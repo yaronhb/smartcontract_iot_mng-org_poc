@@ -1,0 +1,7 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define if you have <mysql.h> */
+#undef HAVE_MYSQL_H
+
+/* Define if you have <mysql/mysql.h> */
+#undef HAVE_MYSQL_MYSQL_H

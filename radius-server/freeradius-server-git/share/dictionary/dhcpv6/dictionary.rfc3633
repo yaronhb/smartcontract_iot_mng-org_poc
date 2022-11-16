@@ -1,0 +1,24 @@
+# -*- text -*-
+# Copyright (C) 2022 The FreeRADIUS Server project and contributors
+# This work is licensed under CC-BY version 4.0 https://creativecommons.org/licenses/by/4.0
+# Version $Id$
+##############################################################################
+#
+#  RFC3633 - IPv6 Prefix Options for
+#	     Dynamic Host Configuration Protocol (DHCP) version 6
+#
+##############################################################################
+
+ATTRIBUTE	IA-PD					25	struct
+MEMBER		IAID					uint32
+MEMBER		T1					time_delta # time delta from "now" in seconds
+MEMBER		T2					time_delta # time delta from "now" in seconds
+MEMBER		Options					group # of IA-PD and other options
+
+# An IA_PD Prefix option may appear only in an IA_PD option
+ATTRIBUTE	IA-PD-Prefix				26	struct
+MEMBER		Preferred-Lifetime			time_delta  # time delta from "now" in seconds
+MEMBER		Valid-Lifetime				time_delta  # time delta from "now" in seconds
+MEMBER		IPv6-Prefix				ipv6prefix
+MEMBER		Options					group 	# of other options associated with this prefix
+

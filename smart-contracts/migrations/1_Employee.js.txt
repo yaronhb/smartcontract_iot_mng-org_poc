@@ -1,0 +1,19 @@
+const EmployeeManagment = artifacts.require("EmployeeManagment")
+const randomChar = require('random-char')
+
+const HEXDIGITS = "0123456789abcdef"
+const LENGTH = 2 * 32;
+
+function randomID() {
+    let digits = Array.from({length: LENGTH}, _ => randomChar(HEXDIGITS)).join('')
+    return `0x${digits}`
+}
+
+module.exports = async function (deployer, network, accounts) {
+    const employeeManagment = await EmployeeManagment.deployed()
+
+    let e_id = randomID();
+    let e_addr = accounts[1];
+    let e_name = "Emplo Employee"
+    await employeeManagment.new_employee(e_id, e_addr, e_name, {from: accounts[0]})
+}
