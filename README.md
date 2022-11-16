@@ -283,6 +283,10 @@ The door module has two components that communicate via a simple serial protocol
 - A generic door controller that handles the NFC processing, and network connections and controls a door latch with a serial communication protocol.
 - A programmable door latch, that waits for commands to ack on. When a command is received, the controller opens the door and returns a response when the door is closed.
 
+
+Demo video https://youtu.be/AamH4xetnSQ
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/AamH4xetnSQ/0.jpg)](https://www.youtube.com/watch?v=AamH4xetnSQ)
+
 #### Generic Door Controller Module
 The generic module following components:
 - A [lilygo® TTGO T-Display 1.14" LCD esp32 control board](https://www.lilygo.cc/products/lilygo®-ttgo-t-display-1-14-inch-lcd-esp32-control-board?_pos=18&_sid=c786f4283&_ss=r) such that
